@@ -5,7 +5,7 @@ describe("StaticTracer", function() {
         testTracer.trace("var foo = 'bar'");
     });
 
-    describe("when given a line of code that assigns a literal to a variable", function() {
+    xdescribe("when given a line of code that assigns a literal to a variable", function() {
         it("returns an object with the literal accessible by its variable name", function() {
             expect(testTracer.trace("var something = [4, 3, 6];")).toEqual({something: [4, 3, 6]});
             expect(testTracer.trace("var someInt = 6;").someInt).toEqual(6);
@@ -37,6 +37,12 @@ describe("StaticTracer", function() {
             var source = "var x = 5, y = 3;";
             expect(testTracer.trace(source).x).toEqual(5);
             expect(testTracer.trace(source).y).toEqual(3);
+        });
+
+        it("sets the uninitialized variables to null", function() {
+            var source = "var x, y = 5;";
+            expect(testTracer.trace(source).x).toEqual(null);
+            expect(testTracer.trace(source).y).toEqual(5);
         });
     });
 
