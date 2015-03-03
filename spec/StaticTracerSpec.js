@@ -32,6 +32,14 @@ describe("StaticTracer", function() {
         });
     });
 
+    describe("when given multiple literal assignment after the same var statement", function() {
+        it("returns an object with the literals accessible by their variable names", function() {
+            var source = "var x = 5, y = 3;";
+            expect(testTracer.trace(source).x).toEqual(5);
+            expect(testTracer.trace(source).y).toEqual(3);
+        });
+    });
+
     xdescribe("when given an assignment of a previously initialized variable", function() {
         it("assigns the new variable with the literal of the other variable", function() {
             var source = "var first = 'x';\nvar second = first;";
