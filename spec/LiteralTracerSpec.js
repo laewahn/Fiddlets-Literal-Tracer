@@ -1,6 +1,6 @@
-var testTracer = require('../src/StaticTracer.js');
+var testTracer = require('../src/LiteralTracer.js');
 
-describe("StaticTracer", function() {
+describe("LiteralTracer", function() {
     it("accepts some source code", function() {
         testTracer.trace("var foo = 'bar'");
     });
