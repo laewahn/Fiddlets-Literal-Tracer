@@ -6,13 +6,12 @@ describe("StaticTracer", function() {
     });
 
     describe("when given a line of code that assigns a literal to a variable", function() {
-        it("finds the variable and the literal for a string", function() {
-            expect(testTracer.trace("var someString = 'foo';").variable).toEqual("someString");
-            expect(testTracer.trace("var someString = 'foo';").literal).toEqual("foo");
-        });
-        it("finds the variable and the literal for a number", function() {
-            expect(testTracer.trace("var someInt = 9;").variable).toEqual("someInt");
-
+        it("returns an object that indexes the literal by its variable name", function() {
+            expect(testTracer.trace("var something = [4, 3, 6];")).toEqual({something: [4, 3, 6]});
+            expect(testTracer.trace("var someInt = 6;").someInt).toEqual(6);
+            expect(testTracer.trace("var someObj = {foo: 'bar'};").someObj).toEqual({foo: "bar"});
+            expect(testTracer.trace("var someChar = 'x';").someChar).toEqual('x');
+            expect(testTracer.trace("var someString = \"fooBar\";").someString).toEqual("fooBar");
         });
     });
 });
