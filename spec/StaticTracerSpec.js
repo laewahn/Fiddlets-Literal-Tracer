@@ -14,5 +14,11 @@ describe("StaticTracer", function() {
             expect(testTracer.trace("var someString = \"fooBar\";").someString).toEqual("fooBar");
         });
     });
+
+    describe("when given a line of code with no variable assignment", function() {
+        it("sets the variable to null", function() {
+            expect(testTracer.trace("var someNothing;").someNothing).toEqual(null);
+        });
+    });
 });
     

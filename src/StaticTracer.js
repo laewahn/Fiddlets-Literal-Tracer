@@ -8,6 +8,11 @@ exports.trace = function(source) {
     var firstDeclaration = parsed.body[0].declarations[0];
     var varName = firstDeclaration.id.name;
     var varValue;
+    
+    if(firstDeclaration.init == null) {
+        returnObject[varName] = null;
+        return returnObject;
+    }
     if(firstDeclaration.init.type === "ArrayExpression") {
         var elements = [];
         var idx;
