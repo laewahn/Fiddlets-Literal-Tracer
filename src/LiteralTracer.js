@@ -24,32 +24,30 @@ function evaluateVariableDeclaration(declarations, tracingResults) {
 
   declarations.forEach(function(declaration) {
     
-    var varValue;
     var varName = declaration.id.name;
-    declaration.init = declaration.init || {type: "Uninitialized"}; 
-
+    
+    if (declaration.init == null) {
+      tracingResults[varName] = null;
+      return;
+    };
+    
     switch(declaration.init.type) {
-      case "Uninitialized" :
-        varValue = null;
-        break;
       case "ArrayExpression" :
-        varValue = elementsOf(declaration.init);    
+        tracingResults[varName] = elementsOf(declaration.init);    
         break;
       case "ObjectExpression" :
-        varValue = propertiesOf(declaration.init);
+        tracingResults[varName] = propertiesOf(declaration.init);
         break;
       case "AssignmentExpression" :
         var assignedTo = evaluateExpressionStatement(declaration.init, tracingResults);
-        varValue = tracingResults[assignedTo];
+        tracingResults[varName] = tracingResults[assignedTo];
         break;
       case "BinaryExpression" :
-        varValue = evaluateBinaryExpression(declaration.init, tracingResults);
+        tracingResults[varName] = evaluateBinaryExpression(declaration.init, tracingResults);
         break;
       default:
-        varValue = valueFor(declaration.init, tracingResults);
+        tracingResults[varName] = valueFor(declaration.init, tracingResults);
     }
-    
-    tracingResults[varName] = varValue;
   });
 }
 
