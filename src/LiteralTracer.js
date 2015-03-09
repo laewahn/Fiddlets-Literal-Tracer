@@ -14,6 +14,9 @@ exports.trace = function(source) {
           break;
         case "ExpressionStatement":
           evaluateExpressionStatement(line.expression, tracingResults);
+          break;
+        default:
+
       }
     });
     
@@ -25,28 +28,40 @@ function evaluateVariableDeclaration(declarations, tracingResults) {
   declarations.forEach(function(declaration) {
     
     var varName = declaration.id.name;
-    
+  
     if (declaration.init == null) {
       tracingResults[varName] = null;
       return;
     };
-    
-    switch(declaration.init.type) {
-      case "ArrayExpression" :
-        tracingResults[varName] = elementsOf(declaration.init);    
-        break;
-      case "ObjectExpression" :
-        tracingResults[varName] = propertiesOf(declaration.init);
-        break;
-      case "AssignmentExpression" :
-        var assignedTo = evaluateExpressionStatement(declaration.init, tracingResults);
-        tracingResults[varName] = tracingResults[assignedTo];
-        break;
-      default:
-        tracingResults[varName] = valueFor(declaration.init, tracingResults);
-    }
+
+    initializeVariable(varName, declaration.init, tracingResults);
   });
 }
+
+function initializeVariable(variableName, initialization, tracingResults) {
+  switch(initialization.type) {
+    case "ArrayExpression" :
+      tracingResults[variableName] = elementsOf(initialization);    
+      break;
+    case "ObjectExpression" :
+      tracingResults[variableName] = propertiesOf(initialization);
+      break;
+    case "AssignmentExpression" :
+      var assignedTo = evaluateExpressionStatement(initialization, tracingResults);
+      tracingResults[variableName] = tracingResults[assignedTo];
+      break;
+    case "Literal" :
+      tracingResults[variableName] = initialization.value;
+      break;
+    case "Identifier" :
+      tracingResults[variableName] =  tracingResults[initialization.name];
+      break;
+    case "BinaryExpression" :
+      tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
+      break;
+    default:
+  }
+} 
 
 function evaluateBinaryExpression(expression, tracingResults) {
   var lValue = valueFor(expression.left, tracingResults);
@@ -57,25 +72,27 @@ function evaluateBinaryExpression(expression, tracingResults) {
       return lValue + rValue;
     case "-" :
       return lValue - rValue;
+    case "*" :
+      return lValue * rValue;
     case "/" :
       return lValue / rValue;
     case "%" :
       return lValue % rValue;
     default:
-      return lValue * rValue;
+
   }
-  
 }
 
 function valueFor(identifierOrLiteral, tracingResults) {
-  if (identifierOrLiteral.type === "Literal") {
-    return identifierOrLiteral.value;
-  } else if(identifierOrLiteral.type == "Identifier") {
-    return tracingResults[identifierOrLiteral.name];
-  } else if(identifierOrLiteral.type == "BinaryExpression") {
-    return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+  switch(identifierOrLiteral.type) {
+    case "Literal" :
+      return identifierOrLiteral.value;
+    case "Identifier" :
+      return tracingResults[identifierOrLiteral.name];
+    case "BinaryExpression" :
+      return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+    default:
   }
-
 }
 
 function evaluateExpressionStatement(expression, tracingResults) {

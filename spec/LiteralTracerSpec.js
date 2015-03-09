@@ -1,5 +1,11 @@
 var testTracer = require('../src/LiteralTracer.js');
 
+describe("For unsupported types", function() {
+    it("throws an exception", function() {
+        fail("How do I throws exception?");
+    });
+});
+
 describe("For literal assignments" , function() {
     describe("given a line of code that assigns a literal to a variable", function() {
         it("returns an object with the literal accessible by its variable name", function() {
