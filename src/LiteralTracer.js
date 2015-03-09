@@ -5,22 +5,22 @@ exports.trace = function(source) {
     var parsed = esprima.parse(source);
     // console.log(JSON.stringify(parsed, null, 2));
 
-    var returnObject = {};
+    var tracingResults = {};
     
     parsed.body.forEach(function(line) {
       switch(line.type) {
         case "VariableDeclaration": 
-          evaluateVariableDeclaration(line.declarations, returnObject);         
+          evaluateVariableDeclaration(line.declarations, tracingResults);         
           break;
         case "ExpressionStatement":
-          evaluateExpressionStatement(line.expression, returnObject);
+          evaluateExpressionStatement(line.expression, tracingResults);
       }
     });
     
-    return returnObject; 
+    return tracingResults; 
 };
 
-function evaluateVariableDeclaration(declarations, returnObject) {
+function evaluateVariableDeclaration(declarations, tracingResults) {
 
   declarations.forEach(function(declaration) {
     
@@ -39,23 +39,23 @@ function evaluateVariableDeclaration(declarations, returnObject) {
         varValue = propertiesOf(declaration.init);
         break;
       case "AssignmentExpression" :
-        var assignedTo = evaluateExpressionStatement(declaration.init, returnObject);
-        varValue = returnObject[assignedTo];
+        var assignedTo = evaluateExpressionStatement(declaration.init, tracingResults);
+        varValue = tracingResults[assignedTo];
         break;
       case "BinaryExpression" :
-        varValue = evaluateBinaryExpression(declaration.init, returnObject);
+        varValue = evaluateBinaryExpression(declaration.init, tracingResults);
         break;
       default:
-        varValue = valueFor(declaration.init, returnObject);
+        varValue = valueFor(declaration.init, tracingResults);
     }
     
-    returnObject[varName] = varValue;
+    tracingResults[varName] = varValue;
   });
 }
 
-function evaluateBinaryExpression(expression, returnObject) {
-  var lValue = valueFor(expression.left, returnObject);
-  var rValue = valueFor(expression.right, returnObject);
+function evaluateBinaryExpression(expression, tracingResults) {
+  var lValue = valueFor(expression.left, tracingResults);
+  var rValue = valueFor(expression.right, tracingResults);
   
   switch(expression.operator) {
     case "+" :
@@ -72,28 +72,28 @@ function evaluateBinaryExpression(expression, returnObject) {
   
 }
 
-function valueFor(identifierOrLiteral, returnObject) {
+function valueFor(identifierOrLiteral, tracingResults) {
   if (identifierOrLiteral.type === "Literal") {
     return identifierOrLiteral.value;
   } else if(identifierOrLiteral.type == "Identifier") {
-    return returnObject[identifierOrLiteral.name];
+    return tracingResults[identifierOrLiteral.name];
   };
 
 }
 
-function evaluateExpressionStatement(expression, returnObject) {
+function evaluateExpressionStatement(expression, tracingResults) {
   var assignTo = expression.left.name; 
 
   switch(expression.right.type) {
     case "Identifier" :
-      returnObject[assignTo] = returnObject[expression.right.name];
+      tracingResults[assignTo] = tracingResults[expression.right.name];
       break;
     case "Literal" :
-      returnObject[assignTo] = expression.right.value;
+      tracingResults[assignTo] = expression.right.value;
       break;
     default :
-      var previouslyAssigned = evaluateExpressionStatement(expression.right, returnObject);
-      returnObject[assignTo] = returnObject[previouslyAssigned];
+      var previouslyAssigned = evaluateExpressionStatement(expression.right, tracingResults);
+      tracingResults[assignTo] = tracingResults[previouslyAssigned];
       assignTo = previouslyAssigned;     
   }
 
