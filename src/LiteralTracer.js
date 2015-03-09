@@ -42,21 +42,15 @@ exports.trace = function(source) {
 };
 
 function elementsOf(initialization) {
-  var elements = [];
-  var idx;
-
-  for(idx in initialization.elements) {
-    elements.push(initialization.elements[idx].value);
-  }
-
-  return elements;
+  return _.reduce(initialization.elements, function(result, element) {
+    result.push(element.value);
+    return result;
+  }, []);
 }
 
 function propertiesOf(initialization) {
-  var object = {};
-  _.reduce(initialization.properties, function(result, property) {
+  return _.reduce(initialization.properties, function(result, property) {
     result[property.key.name] = property.value.value;  
-  }, object);
-
-  return object;
+    return result;
+  }, {});
 }
