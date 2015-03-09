@@ -27,15 +27,18 @@ function evaluateVariableDeclaration(declarations, tracingResults) {
 
   declarations.forEach(function(declaration) {
     
-    var varName = declaration.id.name;
-  
-    if (declaration.init == null) {
-      tracingResults[varName] = null;
-      return;
+    var varName = declareVariable(declaration, tracingResults);
+    
+    if (declaration.init != null) {
+      initializeVariable(varName, declaration.init, tracingResults);  
     };
-
-    initializeVariable(varName, declaration.init, tracingResults);
   });
+}
+
+function declareVariable(declaration, tracingResults) {
+  var varName = declaration.id.name;
+  tracingResults[varName] = null;
+  return varName
 }
 
 function initializeVariable(variableName, initialization, tracingResults) {
