@@ -149,4 +149,15 @@ describe("when there is a mathematical computation that does not use any functio
         expect(result.c).toEqual(4);
         expect(result.d).toEqual(24);
     });
+
+    it("uses multiplication and division before plus and minus", function() {
+        var source = "var a = 2 + 2 * 4;";
+        expect(testTracer.trace(source).a).toEqual(10);
+    });
+
+    it("respects parenthesis", function() {
+        var source = "var a = (2 + 2) * 4;";
+        expect(testTracer.trace(source).a).toEqual(16);
+    });
+
 });
