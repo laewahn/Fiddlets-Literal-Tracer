@@ -1,4 +1,5 @@
 var esprima = require('esprima');
+var _ = require('lodash');
 
 exports.trace = function(source) {
     var parsed = esprima.parse(source);
@@ -20,7 +21,7 @@ exports.trace = function(source) {
           case "Uninitialized" :
             varValue = null;
             break;
-            
+
           case "ArrayExpression" :
             varValue = elementsOf(declaration.init);    
             break;
