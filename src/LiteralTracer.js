@@ -13,29 +13,39 @@ exports.trace = function(source) {
 
     for(lineIdx in parsed.body) {
       line = parsed.body[lineIdx];
-      for(declIdx in line.declarations) {
-        var declaration = line.declarations[declIdx];
-        varName = declaration.id.name;
-        declaration.init = declaration.init || {type: "Uninitialized"}; 
-        switch(declaration.init.type) {
-          case "Uninitialized" :
-            varValue = null;
-            break;
+      if(line.type === "VariableDeclaration") {
+        for(declIdx in line.declarations) {
+          var declaration = line.declarations[declIdx];
+          varName = declaration.id.name;
+          declaration.init = declaration.init || {type: "Uninitialized"}; 
+          switch(declaration.init.type) {
+            case "Uninitialized" :
+              varValue = null;
+              break;
 
-          case "ArrayExpression" :
-            varValue = elementsOf(declaration.init);    
-            break;
+            case "ArrayExpression" :
+              varValue = elementsOf(declaration.init);    
+              break;
 
-          case "ObjectExpression" :
-            varValue = propertiesOf(declaration.init);
-            break;
+            case "ObjectExpression" :
+              varValue = propertiesOf(declaration.init);
+              break;
 
-          default:
-            varValue = declaration.init.value || returnObject[declaration.init.name];
+            default:
+              varValue = declaration.init.value || returnObject[declaration.init.name];
+          }
+          returnObject[varName] = varValue;
+        } 
+
+      } else if(line.type === "ExpressionStatement") {
+          var expression = line.expression;
+          var to = expression.left.name;
+          var from = expression.right.value;
+          varName = to;
+          varValue = from;
+
+          returnObject[varName] = varValue;
         }
-        
-        returnObject[varName] = varValue;
-      }
     }
     
     return returnObject; 
