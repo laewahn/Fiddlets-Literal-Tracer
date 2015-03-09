@@ -54,12 +54,9 @@ function elementsOf(initialization) {
 
 function propertiesOf(initialization) {
   var object = {};
-  var idx;
-  var props = initialization.properties;
-  
-  for(idx in props) {
-    object[props[idx].key.name] = props[idx].value.value; 
-  }
+  _.reduce(initialization.properties, function(result, property) {
+    result[property.key.name] = property.value.value;  
+  }, object);
 
   return object;
 }
