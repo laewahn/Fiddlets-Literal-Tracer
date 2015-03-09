@@ -55,12 +55,32 @@ describe("given an assignment of a previously initialized variable", function() 
     });
 });
 
-describe("when a variable is set to a new value", function() {
-    it("has the new value for the variable", function() {
+describe("when there is a variable assignment", function() {
+    it("sets the new value for the variable", function() {
         var source = "var a = 'a';\na = 'b';"
         var result = testTracer.trace(source);
         expect(result.a).not.toEqual('a');
         expect(result.a).toEqual('b');
+    });
+
+    it("sets all the values for multi assignments to a new variable", function() {
+        var source = "var a = 'a'\n;var e = 'e'\n; var b, c, d;\na = b = c = d = e;";
+        var result = testTracer.trace(source);
+        expect(result.e).toEqual('e');
+
+        expect(result.a).toEqual('e');
+        expect(result.b).toEqual('e');
+        expect(result.c).toEqual('e');
+        expect(result.d).toEqual('e');
+    });
+
+    it("sets all the values for multi assignments to a new constant", function() {
+        var source = "var a, b, c;\na = b = c = 42;";
+        var result = testTracer.trace(source);
+
+        expect(result.a).toEqual(42);
+        expect(result.b).toEqual(42);
+        expect(result.c).toEqual(42);
     });
 });
     

@@ -3,7 +3,6 @@ var _ = require('lodash');
 
 exports.trace = function(source) {
     var parsed = esprima.parse(source);
-    // console.log(JSON.stringify(parsed, null, 2));
     
     var returnObject = {};
     var varValue;
@@ -38,18 +37,33 @@ exports.trace = function(source) {
         } 
 
       } else if(line.type === "ExpressionStatement") {
-          var expression = line.expression;
-          var to = expression.left.name;
-          var from = expression.right.value;
-          varName = to;
-          varValue = from;
-
-          returnObject[varName] = varValue;
+          evaluateExpressionStatement(line.expression, returnObject);
         }
     }
     
     return returnObject; 
 };
+
+function evaluateExpressionStatement(expression, returnObject) {
+
+  var assignTo = expression.left.name; 
+  var val;
+
+  switch(expression.right.type) {
+    case "Identifier" :
+      returnObject[assignTo] = returnObject[expression.right.name];
+      break;
+    case "Literal" :
+      returnObject[assignTo] = expression.right.value;
+      break;
+    default :
+      var previouslyAssigned = evaluateExpressionStatement(expression.right, returnObject);
+      returnObject[assignTo] = returnObject[previouslyAssigned];
+      assignTo = previouslyAssigned;     
+  }
+
+  return assignTo;
+}
 
 function elementsOf(initialization) {
   return _.reduce(initialization.elements, function(result, element) {
