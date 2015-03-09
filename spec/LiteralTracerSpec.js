@@ -55,7 +55,7 @@ describe("given an assignment of a previously initialized variable", function() 
     });
 });
 
-xdescribe("when a variable is set to a new value", function() {
+describe("when a variable is set to a new value", function() {
     it("has the new value for the variable", function() {
         var source = "var a = 'a';\na = 'b;'"
         var result = testTracer.trace(source);
