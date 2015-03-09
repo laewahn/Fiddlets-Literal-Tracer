@@ -54,7 +54,7 @@ function evaluateVariableDeclaration(declarations, tracingResults) {
 function evaluateBinaryExpression(expression, tracingResults) {
   var lValue = valueFor(expression.left, tracingResults);
   var rValue = valueFor(expression.right, tracingResults);
-  
+
   switch(expression.operator) {
     case "+" :
       return lValue + rValue;
@@ -75,7 +75,9 @@ function valueFor(identifierOrLiteral, tracingResults) {
     return identifierOrLiteral.value;
   } else if(identifierOrLiteral.type == "Identifier") {
     return tracingResults[identifierOrLiteral.name];
-  };
+  } else if(identifierOrLiteral.type == "BinaryExpression") {
+    return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+  }
 
 }
 

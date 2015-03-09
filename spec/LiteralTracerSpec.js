@@ -102,7 +102,7 @@ describe("For assignments of already initialized variables", function() {
 
 
 describe("when there is a mathematical computation that does not use any functions", function() {
-    it("set the variable to the calculated result", function(){
+    it("set the variable to the calculated result for simple calculations", function(){
         var source = "var a = 7 * 6;";
         expect(testTracer.trace(source).a).toEqual(42);
 
@@ -133,5 +133,14 @@ describe("when there is a mathematical computation that does not use any functio
 
         source = "var a = 9; var b = 2; var c = a % b;";
         expect(testTracer.trace(source).c).toEqual(1);
+    });
+
+    it("set the variable to the calculated result for complex calculations", function(){
+        var source = "var a = 2, b = 3, c = 4;var d = a * b * c;";
+        var result = testTracer.trace(source);
+        expect(result.a).toEqual(2);
+        expect(result.b).toEqual(3);
+        expect(result.c).toEqual(4);
+        expect(result.d).toEqual(24);
     });
 });
