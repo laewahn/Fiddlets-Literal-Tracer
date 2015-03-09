@@ -121,5 +121,11 @@ describe("when there is a mathematical computation that does not use any functio
         expect(result.a).toEqual(6);
         expect(result.b).toEqual(7);
         expect(result.c).toEqual(42);
+
+        source = "var a = 6; var b = 7; var c = a + b;";
+        expect(result.c).toEqual(13;
+
+        source = "var a = 6; var b = 7; var c = a - b;";
+        expect(result.c).toEqual(-1);
     });
 });
