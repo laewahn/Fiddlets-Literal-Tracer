@@ -6,29 +6,28 @@ exports.trace = function(source) {
     // console.log(JSON.stringify(parsed, null, 2));
 
     var returnObject = {};
-    var varValue;
-    var lineIdx;
-    var declIdx;
-    var line;
-
-    for(lineIdx in parsed.body) {
-      line = parsed.body[lineIdx];
-      if(line.type === "VariableDeclaration") {
+    
+    parsed.body.forEach(function(line) {
+      switch(line.type) {
+        case "VariableDeclaration": 
           evaluateVariableDeclaration(line.declarations, returnObject);         
-      } else if(line.type === "ExpressionStatement") {
+          break;
+        case "ExpressionStatement":
           evaluateExpressionStatement(line.expression, returnObject);
-        }
-    }
+      }
+    });
     
     return returnObject; 
 };
 
 function evaluateVariableDeclaration(declarations, returnObject) {
-  
-  for(declIdx in declarations) {
-    var declaration = declarations[declIdx];
-    varName = declaration.id.name;
+
+  declarations.forEach(function(declaration) {
+    
+    var varValue;
+    var varName = declaration.id.name;
     declaration.init = declaration.init || {type: "Uninitialized"}; 
+
     switch(declaration.init.type) {
       case "Uninitialized" :
         varValue = null;
@@ -48,13 +47,12 @@ function evaluateVariableDeclaration(declarations, returnObject) {
     }
     
     returnObject[varName] = varValue;
-  }
+  });
 }
 
 function evaluateExpressionStatement(expression, returnObject) {
 
   var assignTo = expression.left.name; 
-  var val;
 
   switch(expression.right.type) {
     case "Identifier" :
