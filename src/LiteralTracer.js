@@ -3,7 +3,8 @@ var _ = require('lodash');
 
 exports.trace = function(source) {
     var parsed = esprima.parse(source);
-    
+    // console.log(JSON.stringify(parsed, null, 2));
+
     var returnObject = {};
     var varValue;
     var lineIdx;
@@ -14,7 +15,6 @@ exports.trace = function(source) {
       line = parsed.body[lineIdx];
       if(line.type === "VariableDeclaration") {
           evaluateVariableDeclaration(line.declarations, returnObject);         
-
       } else if(line.type === "ExpressionStatement") {
           evaluateExpressionStatement(line.expression, returnObject);
         }
@@ -38,6 +38,10 @@ function evaluateVariableDeclaration(declarations, returnObject) {
         break;
       case "ObjectExpression" :
         varValue = propertiesOf(declaration.init);
+        break;
+      case "AssignmentExpression" :
+        var assignedTo = evaluateExpressionStatement(declaration.init, returnObject);
+        varValue = returnObject[assignedTo];
         break;
       default:
         varValue = declaration.init.value || returnObject[declaration.init.name];

@@ -84,3 +84,14 @@ describe("when there is a variable assignment", function() {
     });
 });
     
+describe("when there are mixed assignments and declarations", function() {
+    it("set them accordingly", function() {
+        var source = "var a, b = 5, d, a = c = b;\n";
+        var result = testTracer.trace(source);
+
+        expect(result.a).toEqual(5);
+        expect(result.b).toEqual(5);
+        expect(result.c).toEqual(5);
+        expect(result.d).toEqual(null);
+    });
+});
