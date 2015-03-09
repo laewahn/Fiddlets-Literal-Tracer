@@ -54,7 +54,22 @@ function evaluateVariableDeclaration(declarations, returnObject) {
 }
 
 function evaluateBinaryExpression(expression, returnObject) {
-  return valueFor(expression.left, returnObject) * valueFor(expression.right, returnObject);
+  var lValue = valueFor(expression.left, returnObject);
+  var rValue = valueFor(expression.right, returnObject);
+  
+  switch(expression.operator) {
+    case "+" :
+      return lValue + rValue;
+    case "-" :
+      return lValue - rValue;
+    case "/" :
+      return lValue / rValue;
+    case "%" :
+      return lValue % rValue;
+    default:
+      return lValue * rValue;
+  }
+  
 }
 
 function valueFor(identifierOrLiteral, returnObject) {
