@@ -46,7 +46,7 @@ function evaluateVariableDeclaration(declarations, returnObject) {
         varValue = evaluateBinaryExpression(declaration.init, returnObject);
         break;
       default:
-        varValue = declaration.init.value || returnObject[declaration.init.name];
+        varValue = valueFor(declaration.init, returnObject);
     }
     
     returnObject[varName] = varValue;
