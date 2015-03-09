@@ -13,28 +13,7 @@ exports.trace = function(source) {
     for(lineIdx in parsed.body) {
       line = parsed.body[lineIdx];
       if(line.type === "VariableDeclaration") {
-        for(declIdx in line.declarations) {
-          var declaration = line.declarations[declIdx];
-          varName = declaration.id.name;
-          declaration.init = declaration.init || {type: "Uninitialized"}; 
-          switch(declaration.init.type) {
-            case "Uninitialized" :
-              varValue = null;
-              break;
-
-            case "ArrayExpression" :
-              varValue = elementsOf(declaration.init);    
-              break;
-
-            case "ObjectExpression" :
-              varValue = propertiesOf(declaration.init);
-              break;
-
-            default:
-              varValue = declaration.init.value || returnObject[declaration.init.name];
-          }
-          returnObject[varName] = varValue;
-        } 
+          evaluateVariableDeclaration(line.declarations, returnObject);         
 
       } else if(line.type === "ExpressionStatement") {
           evaluateExpressionStatement(line.expression, returnObject);
@@ -43,6 +22,30 @@ exports.trace = function(source) {
     
     return returnObject; 
 };
+
+function evaluateVariableDeclaration(declarations, returnObject) {
+  
+  for(declIdx in declarations) {
+    var declaration = declarations[declIdx];
+    varName = declaration.id.name;
+    declaration.init = declaration.init || {type: "Uninitialized"}; 
+    switch(declaration.init.type) {
+      case "Uninitialized" :
+        varValue = null;
+        break;
+      case "ArrayExpression" :
+        varValue = elementsOf(declaration.init);    
+        break;
+      case "ObjectExpression" :
+        varValue = propertiesOf(declaration.init);
+        break;
+      default:
+        varValue = declaration.init.value || returnObject[declaration.init.name];
+    }
+    
+    returnObject[varName] = varValue;
+  }
+}
 
 function evaluateExpressionStatement(expression, returnObject) {
 
