@@ -48,9 +48,9 @@ describe("given an assignment of a previously initialized variable", function() 
         expect(result.second).toEqual('x');
     });
     it("assigns variables transitive", function() {
-        var sourse = "var first = 42;\nvar second = first;\nvar third = second";
+        var source = "var first = 42;\nvar second = first;\nvar third = second";
         var result = testTracer.trace(source);
-        expect(result.first).toEqual('x');
+        expect(result.first).toEqual(42);
         expect(result.third).toEqual(result.first);
     });
 });
