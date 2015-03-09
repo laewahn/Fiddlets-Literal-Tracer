@@ -42,6 +42,9 @@ function evaluateVariableDeclaration(declarations, returnObject) {
         var assignedTo = evaluateExpressionStatement(declaration.init, returnObject);
         varValue = returnObject[assignedTo];
         break;
+      case "BinaryExpression" :
+        varValue = evaluateBinaryExpression(declaration.init, returnObject);
+        break;
       default:
         varValue = declaration.init.value || returnObject[declaration.init.name];
     }
@@ -50,8 +53,20 @@ function evaluateVariableDeclaration(declarations, returnObject) {
   });
 }
 
-function evaluateExpressionStatement(expression, returnObject) {
+function evaluateBinaryExpression(expression, returnObject) {
+  return valueFor(expression.left, returnObject) * valueFor(expression.right, returnObject);
+}
 
+function valueFor(identifierOrLiteral, returnObject) {
+  if (identifierOrLiteral.type === "Literal") {
+    return identifierOrLiteral.value;
+  } else if(identifierOrLiteral.type == "Identifier") {
+    return returnObject[identifierOrLiteral.name];
+  };
+
+}
+
+function evaluateExpressionStatement(expression, returnObject) {
   var assignTo = expression.left.name; 
 
   switch(expression.right.type) {
