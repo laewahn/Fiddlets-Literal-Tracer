@@ -48,11 +48,19 @@ describe("given an assignment of a previously initialized variable", function() 
         expect(result.second).toEqual('x');
     });
     it("assigns variables transitive", function() {
-        var source = "var first = 42;\nvar second = first;\nvar third = second";
+        var source = "var first = 42;\nvar second = first;\nvar third = second;";
         var result = testTracer.trace(source);
         expect(result.first).toEqual(42);
         expect(result.third).toEqual(result.first);
     });
 });
 
+describe("when a variable is set to a new value", function() {
+    it("has the new value for the variable", function() {
+        var source = "var a = 'a';\na = 'b;'"
+        var result = testTracer.trace(source);
+        expect(result.a).not.toEqual('a');
+        expect(result.a).toEqual('b');
+    });
+});
     
