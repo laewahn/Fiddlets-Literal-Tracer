@@ -18,8 +18,6 @@ exports.trace = function(source) {
         
         if(declaration.init == null) {
           varValue = null;
-            // returnObject[varName] = null;
-            // return returnObject;
         } else {
           if(declaration.init.type === "ArrayExpression") {
               var elements = [];
@@ -37,7 +35,7 @@ exports.trace = function(source) {
              }
              varValue = object;
           } else {
-             varValue = declaration.init.value;
+             varValue = declaration.init.value || returnObject[declaration.init.name];
           }  
         }
     

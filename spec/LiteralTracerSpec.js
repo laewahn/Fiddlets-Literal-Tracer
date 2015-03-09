@@ -1,6 +1,6 @@
 var testTracer = require('../src/LiteralTracer.js');
 
-describe("when given a line of code that assigns a literal to a variable", function() {
+describe("given a line of code that assigns a literal to a variable", function() {
     it("returns an object with the literal accessible by its variable name", function() {
         expect(testTracer.trace("var something = [4, 3, 6];")).toEqual({something: [4, 3, 6]});
         expect(testTracer.trace("var someInt = 6;").someInt).toEqual(6);
@@ -10,13 +10,13 @@ describe("when given a line of code that assigns a literal to a variable", funct
     });
 });
 
-describe("when given a line of code with no variable assignment", function() {
+describe("given a line of code with no variable assignment", function() {
     it("sets the variable to null", function() {
         expect(testTracer.trace("var someNothing;").someNothing).toEqual(null);
     });
 });
 
-describe("when given multiple literal assignments", function() {
+describe("given multiple literal assignments", function() {
     it("returns an object with the literals accessible by their variable names", function() {
         var source = "var someInt = 42;\nvar someString = 'asdf';\nvar someArray = ['a', 'b', 'c'];\n" +
                      "var someObj = {bar : 'baz'}";
@@ -27,7 +27,7 @@ describe("when given multiple literal assignments", function() {
     });
 });
 
-describe("when given multiple literal assignment after the same var statement", function() {
+describe("given multiple literal assignment after the same var statement", function() {
     it("returns an object with the literals accessible by their variable names", function() {
         var source = "var x = 5, y = 3;";
         expect(testTracer.trace(source).x).toEqual(5);
@@ -40,11 +40,12 @@ describe("when given multiple literal assignment after the same var statement", 
     });
 });
 
-xdescribe("when given an assignment of a previously initialized variable", function() {
+describe("given an assignment of a previously initialized variable", function() {
     it("assigns the new variable with the literal of the other variable", function() {
         var source = "var first = 'x';\nvar second = first;";
-        expect(testTracer.trace(source).first).toEqual('x');
-        expect(testTracer.trace(source).second).toEqual('x');
+        var result = testTracer.trace(source);
+        expect(result.first).toEqual('x');
+        expect(result.second).toEqual('x');
     });
 });
 
