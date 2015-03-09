@@ -159,5 +159,24 @@ describe("when there is a mathematical computation that does not use any functio
         var source = "var a = (2 + 2) * 4;";
         expect(testTracer.trace(source).a).toEqual(16);
     });
+});
 
+describe("when there are string constants", function() {
+    it("allows for concatenation with other string constants", function() {
+        var source = "var foo = 'foo'; var bar = 'bar'; var foobar = foo + bar";
+        var result = testTracer.trace(source);
+
+        expect(result.foo).toEqual("foo");
+        expect(result.bar).toEqual("bar");
+        expect(result.foobar).toEqual("foobar");
+    });
+
+    it("allows for concatenation with ints (which is that weird javascript thing..)", function() {
+        var source = "var foo = 'foo'; var bar = 42; var foobar = foo + bar";
+        var result = testTracer.trace(source);
+
+        expect(result.foo).toEqual("foo");
+        expect(result.bar).toEqual(42);
+        expect(result.foobar).toEqual("foo42");
+    });
 });
