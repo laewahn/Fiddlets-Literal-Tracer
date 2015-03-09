@@ -42,9 +42,6 @@ function evaluateVariableDeclaration(declarations, tracingResults) {
         var assignedTo = evaluateExpressionStatement(declaration.init, tracingResults);
         tracingResults[varName] = tracingResults[assignedTo];
         break;
-      case "BinaryExpression" :
-        tracingResults[varName] = evaluateBinaryExpression(declaration.init, tracingResults);
-        break;
       default:
         tracingResults[varName] = valueFor(declaration.init, tracingResults);
     }
