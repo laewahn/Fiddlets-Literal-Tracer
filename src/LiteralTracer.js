@@ -15,33 +15,50 @@ exports.trace = function(source) {
       for(declIdx in line.declarations) {
         var declaration = line.declarations[declIdx];
         varName = declaration.id.name;
-        
-        if(declaration.init == null) {
-          varValue = null;
-        } else {
-          if(declaration.init.type === "ArrayExpression") {
-              var elements = [];
-              var idx;
-              for(idx in declaration.init.elements) {
-                  elements.push(declaration.init.elements[idx].value);
-              }
-              varValue = elements;
-          } else if(declaration.init.type === "ObjectExpression") {
-             var object = {};
-             var idx;
-             var props = declaration.init.properties;
-             for(idx in props) {
-                 object[props[idx].key.name] = props[idx].value.value; 
-             }
-             varValue = object;
-          } else {
-             varValue = declaration.init.value || returnObject[declaration.init.name];
-          }  
+        declaration.init = declaration.init || {type: "Uninitialized"}; 
+        switch(declaration.init.type) {
+          case "Uninitialized" :
+            varValue = null;
+            break;
+            
+          case "ArrayExpression" :
+            varValue = elementsOf(declaration.init);    
+            break;
+
+          case "ObjectExpression" :
+            varValue = propertiesOf(declaration.init);
+            break;
+
+          default:
+            varValue = declaration.init.value || returnObject[declaration.init.name];
         }
-    
+        
         returnObject[varName] = varValue;
       }
     }
     
     return returnObject; 
 };
+
+function elementsOf(initialization) {
+  var elements = [];
+  var idx;
+
+  for(idx in initialization.elements) {
+    elements.push(initialization.elements[idx].value);
+  }
+
+  return elements;
+}
+
+function propertiesOf(initialization) {
+  var object = {};
+  var idx;
+  var props = initialization.properties;
+  
+  for(idx in props) {
+    object[props[idx].key.name] = props[idx].value.value; 
+  }
+
+  return object;
+}
