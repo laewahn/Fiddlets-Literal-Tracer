@@ -94,13 +94,15 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return tracingResults[identifierOrLiteral.name];
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+    case "AssignmentExpression" :
+      return evaluateExpressionStatement(identifierOrLiteral, tracingResults);
     default:
   }
 }
 
 function evaluateExpressionStatement(expression, tracingResults) {
   var assignTo = expression.left.name; 
-
+  
   switch(expression.right.type) {
     case "Identifier" :
       tracingResults[assignTo] = tracingResults[expression.right.name];
