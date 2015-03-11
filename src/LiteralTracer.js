@@ -95,7 +95,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
     case "MemberExpression" :
-      return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
+      return tracingResults[valueFor(identifierOrLiteral.object)][valueFor(identifierOrLiteral.property, tracingResults)];
     default:  
   }
 }
