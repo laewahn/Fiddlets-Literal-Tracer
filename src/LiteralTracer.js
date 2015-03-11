@@ -102,7 +102,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
   } else if (expression.type === "MemberExpression") {
-    console.log(expression.type);
+    
   }
 }
 
@@ -116,7 +116,7 @@ function evaluateAssignmentExpression(expression, tracingResults) {
     assignTo = previouslyAssigned;     
   } else  if (expression.left.type === "MemberExpression") {
     assignTo = valueFor(expression.left.object, tracingResults);
-    var theProperty = expression.left.property.name;
+    var theProperty = (expression.left.computed) ? valueFor(expression.left.property, tracingResults) : expression.left.property.name;
     assignTo[theProperty] = valueFor(expression.right);
   } else {
     tracingResults[assignTo] = valueFor(expression.right, tracingResults);
