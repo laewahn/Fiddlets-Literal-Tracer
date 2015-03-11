@@ -15,8 +15,15 @@ exports.trace = function(source) {
         case "ExpressionStatement":
           evaluateExpressionStatement(line.expression, tracingResults);
           break;
+        case "FunctionDeclaration":
+          // console.log(JSON.stringify(line, null, 2));
+          tracingResults[line.id.name] = new Function();
+          break;
+        case "EmptyStatement":
+          break;
         default:
           // console.log(JSON.stringify(line, null, 2));
+          throw new Error("Unsupported type: " + line.type);
       }
     });
     
@@ -65,6 +72,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       break;
     default:
       // console.log(JSON.stringify(initialization, null, 2));
+      throw new Error("Unsupported type: " + line.type);
   }
 } 
 
@@ -85,6 +93,7 @@ function evaluateBinaryExpression(expression, tracingResults) {
       return lValue % rValue;
     default:
       // console.log(JSON.stringify(expression, null, 2));
+      throw new Error("Unsupported type: " + line.type);
   }
 }
 
@@ -97,14 +106,15 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
     case "MemberExpression" :
-      if(valueFor(identifierOrLiteral.property, tracingResults) === "prototype") {
-        return {};
-      }
+      // if(valueFor(identifierOrLiteral.property, tracingResults) === "prototype") {
+        // return {};
+      // }
       return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
     default:  
       // console.log(JSON.stringify(identifierOrLiteral, null, 2));
+      throw new Error("Unsupported type: " + line.type);
   }
 }
 
@@ -113,6 +123,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
     evaluateAssignmentExpression(expression, tracingResults);
   } else {
     // console.log(JSON.stringify(expression, null, 2));
+    throw new Error("Unsupported type: " + line.type);
   }
 }
 

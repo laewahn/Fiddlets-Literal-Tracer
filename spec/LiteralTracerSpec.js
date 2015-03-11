@@ -254,3 +254,26 @@ describe("For variables in functions", function() {
         expect(testTracer.trace(source).a).toEqual(5);
     });
 });
+
+describe("For function declarations", function() {
+    it("stores the function", function() {
+        var source = "function Cursor(){}";
+        expect(testTracer.trace(source).Cursor).not.toBe(null);
+    });
+
+    it("can register the constructor on the prototype", function() {
+        var source = "function Cursor(){}\nCursor.prototype.constructor = Cursor;";
+        var result = testTracer.trace(source);
+
+        expect(result.Cursor.prototype).not.toEqual(null);
+        expect(result.Cursor.prototype.constructor).not.toEqual(null);
+        expect(result.Cursor.prototype.constructor).toBe(result.Cursor);
+    });
+
+    it("can register members on the prorotype of the function", function() {
+        var source = "function Cursor(){}\nCursor.prototype.constructor = Cursor;\nCursor.prototype.view = 'someView';";
+        var result = testTracer.trace(source);
+
+        expect(result.Cursor.prototype.view).toEqual('someView');
+    });
+});
