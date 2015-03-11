@@ -101,8 +101,8 @@ function valueFor(identifierOrLiteral, tracingResults) {
 function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
-  } else if (expression.type === "MemberExpression") {
-    
+  } else {
+    console.log(expression.type);
   }
 }
 
