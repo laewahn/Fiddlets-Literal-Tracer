@@ -234,10 +234,11 @@ describe("For objects", function() {
     });
 
     it("can access chained propteries", function() {
-        var source = "var a = { b : {}}; a.b.foo = 'bar'";
+        var source = "var a = { b : {}}; a.b.foo = 'bar'; a.b.baz = 'asdf'";
         var result = testTracer.trace(source);
 
         expect(result.a.b.foo).toEqual('bar');
+        expect(result.a.b.baz).toEqual('asdf');
     });
 })
 
