@@ -50,7 +50,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = propertiesOf(initialization);
       break;
     case "AssignmentExpression" :
-      var assignedTo = evaluateExpressionStatement(initialization, tracingResults);
+      var assignedTo = evaluateAssignmentExpression(initialization, tracingResults);
       tracingResults[variableName] = tracingResults[assignedTo];
       break;
     case "Literal" :
@@ -99,16 +99,29 @@ function valueFor(identifierOrLiteral, tracingResults) {
 }
 
 function evaluateExpressionStatement(expression, tracingResults) {
-  var assignTo = expression.left.name; 
+  if(expression.type === "AssignmentExpression") {
+    evaluateAssignmentExpression(expression, tracingResults);
+  } else if (expression.type === "MemberExpression") {
+    console.log(expression.type);
+  }
+}
+
+function evaluateAssignmentExpression(expression, tracingResults) {
+  var assignTo;
+  assignTo = expression.left.name; 
 
   if(expression.right.type === "AssignmentExpression") {
-    var previouslyAssigned = evaluateExpressionStatement(expression.right, tracingResults);
+    var previouslyAssigned = evaluateAssignmentExpression(expression.right, tracingResults);
     tracingResults[assignTo] = tracingResults[previouslyAssigned];
     assignTo = previouslyAssigned;     
+  } else  if (expression.left.type === "MemberExpression") {
+    assignTo = valueFor(expression.left.object, tracingResults);
+    var theProperty = expression.left.property.name;
+    assignTo[theProperty] = valueFor(expression.right);
   } else {
     tracingResults[assignTo] = valueFor(expression.right, tracingResults);
   }
-
+  
   return assignTo;
 }
 

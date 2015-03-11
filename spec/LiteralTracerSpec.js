@@ -182,17 +182,17 @@ describe("when there are string constants", function() {
 });
 
 describe("For objects", function() {
-    it("sets the properties", function() {
-        var source = "var a = {}; a.foo = 'bar'; var b = a; b.baz = 'asdf';"
-        expect(testTracer.trace(source).a.foo).toEqual("bar");
-    });
-
     it("preserves identity", function() {
         var source = "var a = {}; a.foo = 'bar'; var b = a; b.baz = 'asdf';"
         var result = testTracer.trace(source);
-        expect(result.a).toEqual({});
+        expect(result.a).toEqual({ foo: 'bar', baz : 'asdf'});
         expect(result.a).not.toBe({});
         expect(result.b).toBe(result.b);
+    });
+    
+    it("sets the properties using dot notation", function() {
+        var source = "var a = {}; a.foo = 'bar';// var b = a; b.baz = 'asdf';"
+        expect(testTracer.trace(source).a.foo).toEqual("bar");
     });
 })
 
