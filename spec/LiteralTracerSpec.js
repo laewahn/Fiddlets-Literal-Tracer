@@ -180,3 +180,31 @@ describe("when there are string constants", function() {
         expect(result.foobar).toEqual("foo42");
     });
 });
+
+describe("For objects", function() {
+    it("sets the properties", function() {
+        var source = "var a = {}; a.foo = 'bar'; var b = a; b.baz = 'asdf';"
+        expect(testTracer.trace(source).a.foo).toEqual("bar");
+    });
+
+    it("preserves identity", function() {
+        var source = "var a = {}; a.foo = 'bar'; var b = a; b.baz = 'asdf';"
+        var result = testTracer.trace(source);
+        expect(result.a).toEqual({});
+        expect(result.a).not.toBe({});
+        expect(result.b).toBe(result.b);
+    });
+})
+
+describe("For variables in functions", function() {
+    it("does not store them in the global scope", function() {
+        var source = "function foo() {var a = 2;};";
+        expect(testTracer.trace(source).a).toEqual(undefined);
+    });
+
+    it("does not override variables in global scope", function(){
+        var source = "var a = 5; function foo() {var a = 2;};";
+        expect(testTracer.trace(source).a).not.toEqual(2);
+        expect(testTracer.trace(source).a).toEqual(5);
+    });
+});
