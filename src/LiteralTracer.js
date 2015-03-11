@@ -101,6 +101,8 @@ function valueFor(identifierOrLiteral, tracingResults) {
         return {};
       }
       return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
+    case "ObjectExpression" :
+      return propertiesOf(identifierOrLiteral);
     default:  
       // console.log(JSON.stringify(identifierOrLiteral, null, 2));
   }

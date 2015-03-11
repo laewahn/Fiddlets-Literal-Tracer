@@ -40,6 +40,7 @@ describe("For literal assignments" , function() {
             expect(testTracer.trace(source).x).toEqual(5);
             expect(testTracer.trace(source).y).toEqual(3);
         });
+        
         it("sets the uninitialized variables to null", function() {
             var source = "var x, y = 5;";
             expect(testTracer.trace(source).x).toEqual(null);
@@ -49,10 +50,10 @@ describe("For literal assignments" , function() {
 
     describe("given object assignments", function() {
         it("can assign nested objects to the return object", function() {
-            var source = "var a = { b : {}};"
+            var source = "var a = { b : { foo : 'bar'}};"
             var result = testTracer.trace(source);
 
-            expect(result.a.b).toEqual({});
+            expect(result.a.b).toEqual({foo : "bar"});
         });
 
         it("can assign assigned objects into objects", function() {
