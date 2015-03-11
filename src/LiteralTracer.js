@@ -94,7 +94,21 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return tracingResults[identifierOrLiteral.name];
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+    case "MemberExpression" :
+    
+      var theProperty;
+      if (identifierOrLiteral.computed) {
+        theProperty = valueFor(identifierOrLiteral.property, tracingResults);
+      } else {
+        theProperty = (identifierOrLiteral.property.type === "Identifier") ? 
+
+        tracingResults[identifierOrLiteral.object.name][identifierOrLiteral.property.name] :
+        tracingResults[identifierOrLiteral.object.name][identifierOrLiteral.property.value];
+      };
+
+      return theProperty;
     default:
+  
   }
 }
 
@@ -117,7 +131,7 @@ function evaluateAssignmentExpression(expression, tracingResults) {
   } else  if (expression.left.type === "MemberExpression") {
     assignTo = valueFor(expression.left.object, tracingResults);
     var theProperty = (expression.left.computed) ? valueFor(expression.left.property, tracingResults) : expression.left.property.name;
-    assignTo[theProperty] = valueFor(expression.right);
+    assignTo[theProperty] = valueFor(expression.right, tracingResults);
   } else {
     tracingResults[assignTo] = valueFor(expression.right, tracingResults);
   }

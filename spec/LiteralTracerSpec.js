@@ -197,14 +197,22 @@ describe("For objects", function() {
     });
 
     it("sets the properties using array notation with constants", function() {
-       var source = "var a = {}; a['foo'] = 'bar';var b = a; b['baz'] = 'asdf';"
+        var source = "var a = {}; a['foo'] = 'bar';var b = a; b['baz'] = 'asdf';"
         expect(testTracer.trace(source).a.foo).toEqual("bar");
         expect(testTracer.trace(source).a.baz).toEqual("asdf"); 
     });
 
     it("sets the properties using array notation with variables", function() {
-       var source = "var a = {}; var key = 'foo'; a[key] = 'bar'; key = 'baz';var b = a; b['baz'] = 'asdf';"
+        var source = "var a = {}; var key = 'foo'; a[key] = 'bar'; key = 'baz';var b = a; b[key] = 'asdf';"
         expect(testTracer.trace(source).a.foo).toEqual("bar");
+        expect(testTracer.trace(source).a.baz).toEqual("asdf"); 
+    });
+
+    it("sets the properties using array notation with properties of other objects", function() {
+        var source = "var a = {}, b = { key : 'foo'}; a[b.key] = 'bar'; b.key = 'baz'; a[b.key] = 'asdf';"
+        var result = testTracer.trace(source);
+
+        expect(result.a.foo).toEqual("bar");
         expect(testTracer.trace(source).a.baz).toEqual("asdf"); 
     });
 })
