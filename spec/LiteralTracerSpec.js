@@ -46,6 +46,22 @@ describe("For literal assignments" , function() {
             expect(testTracer.trace(source).y).toEqual(5);
         });
     });
+
+    describe("given object assignments", function() {
+        it("can assign nested objects to the return object", function() {
+            var source = "var a = { b : {}};"
+            var result = testTracer.trace(source);
+
+            expect(result.a.b).toEqual({});
+        });
+
+        it("can assign assigned objects into objects", function() {
+            var source = "var asdf = {}; var a = { b : asdf};"
+            var result = testTracer.trace(source);
+
+            expect(result.a.b).toEqual({});
+        });
+    });    
 });
 
 describe("For assignments of already initialized variables", function() {
@@ -214,6 +230,13 @@ describe("For objects", function() {
 
         expect(result.a.foo).toEqual("bar");
         expect(testTracer.trace(source).a.baz).toEqual("asdf"); 
+    });
+
+    it("can access chained propteries", function() {
+        var source = "var a = { b : {}}; a.b.foo = 'bar'";
+        var result = testTracer.trace(source);
+
+        expect(result.a.b.foo).toEqual('bar');
     });
 })
 

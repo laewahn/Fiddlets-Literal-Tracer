@@ -16,7 +16,7 @@ exports.trace = function(source) {
           evaluateExpressionStatement(line.expression, tracingResults);
           break;
         default:
-
+          // console.log(JSON.stringify(line, null, 2));
       }
     });
     
@@ -42,12 +42,13 @@ function declareVariable(declaration, tracingResults) {
 }
 
 function initializeVariable(variableName, initialization, tracingResults) {
+  // console.log(JSON.stringify(initialization, null, 2));
   switch(initialization.type) {
     case "ArrayExpression" :
       tracingResults[variableName] = elementsOf(initialization);    
       break;
     case "ObjectExpression" :
-      tracingResults[variableName] = propertiesOf(initialization);
+      tracingResults[variableName] = propertiesOf(initialization, tracingResults);
       break;
     case "AssignmentExpression" :
       var assignedTo = evaluateAssignmentExpression(initialization, tracingResults);
@@ -63,6 +64,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     default:
+      // console.log(JSON.stringify(initialization, null, 2));
   }
 } 
 
@@ -82,7 +84,7 @@ function evaluateBinaryExpression(expression, tracingResults) {
     case "%" :
       return lValue % rValue;
     default:
-
+      // console.log(JSON.stringify(expression, null, 2));
   }
 }
 
@@ -95,8 +97,12 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
     case "MemberExpression" :
+      if(valueFor(identifierOrLiteral.property, tracingResults) === "prototype") {
+        return {};
+      }
       return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
     default:  
+      // console.log(JSON.stringify(identifierOrLiteral, null, 2));
   }
 }
 
@@ -104,7 +110,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
   } else {
-    console.log(expression.type);
+    // console.log(JSON.stringify(expression, null, 2));
   }
 }
 
@@ -133,9 +139,10 @@ function elementsOf(initialization) {
   }, []);
 }
 
-function propertiesOf(initialization) {
+function propertiesOf(initialization, tracingResults) {
   return _.reduce(initialization.properties, function(result, property) {
-    result[property.key.name] = property.value.value;  
+    result[property.key.name] = valueFor(property.value, tracingResults);
+    
     return result;
   }, {});
 }
