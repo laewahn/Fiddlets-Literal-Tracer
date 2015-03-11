@@ -114,7 +114,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return propertiesOf(identifierOrLiteral);
     default:  
       // console.log(JSON.stringify(identifierOrLiteral, null, 2));
-      throw new Error("Unsupported type: " + line.type);
+      throw new Error("Unsupported type: " + identifierOrLiteral.type);
   }
 }
 
