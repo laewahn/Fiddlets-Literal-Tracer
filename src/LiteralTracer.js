@@ -91,7 +91,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "Literal" :
       return identifierOrLiteral.value;
     case "Identifier" :
-      return tracingResults[identifierOrLiteral.name];
+      return tracingResults[identifierOrLiteral.name] || identifierOrLiteral.name;
     case "BinaryExpression" :
       return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
     case "MemberExpression" :
@@ -100,10 +100,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
       if (identifierOrLiteral.computed) {
         theProperty = valueFor(identifierOrLiteral.property, tracingResults);
       } else {
-        theProperty = (identifierOrLiteral.property.type === "Identifier") ? 
-
-        tracingResults[identifierOrLiteral.object.name][identifierOrLiteral.property.name] :
-        tracingResults[identifierOrLiteral.object.name][identifierOrLiteral.property.value];
+        theProperty = tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
       };
 
       return theProperty;
