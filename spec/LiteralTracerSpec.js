@@ -1,11 +1,5 @@
 var testTracer = require('../src/LiteralTracer.js');
 
-describe("For unsupported types", function() {
-    it("throws an exception", function() {
-        fail("How do I throws exception?");
-    });
-});
-
 describe("For literal assignments" , function() {
     describe("given a line of code that assigns a literal to a variable", function() {
         it("returns an object with the literal accessible by its variable name", function() {
@@ -276,4 +270,9 @@ describe("For function declarations", function() {
 
         expect(result.Cursor.prototype.view).toEqual('someView');
     });
+});
+
+it("blah", function() {
+    var source = "function Cursor() {}; Cursor.prototype.constructor = Cursor; Cursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n";
+    console.log(JSON.stringify(testTracer.trace(source), null, 2));
 });
