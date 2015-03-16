@@ -64,7 +64,7 @@ exports.scopeByName = function(functionName, tracingResults) {
 
 function findScopeByName(functionName, tracingResults) {
 
-  var returnValue;
+  var returnValue = null;
   var nestedScopes = tracingResults.__scopes;
 
   if (nestedScopes[functionName]) {

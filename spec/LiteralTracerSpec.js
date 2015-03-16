@@ -287,6 +287,13 @@ describe("For variable declarations inside functions", function() {
         expect(testTracer.scopeByName('foo2', result).bar).toEqual('asdf'); 
     });
 
+    it("should return null if the function can not be found", function() {
+        var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
+        var result = testTracer.trace(source);
+        
+        expect(testTracer.scopeByName('asdf', result)).toBe(null);    
+    });
+
     it("should have location information for the scopes", function() {
         var source =    "function foo() {\n" + 
                         "   function foo2() {\n" + 
