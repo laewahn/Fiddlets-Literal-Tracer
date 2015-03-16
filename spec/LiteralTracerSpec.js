@@ -286,6 +286,25 @@ describe("For variable declarations inside functions", function() {
     
         expect(testTracer.scopeFor(result, 'foo2').bar).toEqual('asdf'); 
     });
+
+    it("should have location information for the scopes", function() {
+        var source =    "function foo() {\n" + 
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}";
+
+        var result = testTracer.trace(source);
+    
+        expect(testTracer.scopeFor(result, 'foo').__location).not.toBe(undefined);
+        expect(testTracer.scopeFor(result, 'foo').__location).not.toBe(null);
+    
+        expect(testTracer.scopeFor(result, 'foo').__location.start.line).toEqual(1);
+        expect(testTracer.scopeFor(result, 'foo').__location.end.line).toEqual(5);
+
+        expect(testTracer.scopeFor(result, 'foo2').__location.start.line).toEqual(2);
+        expect(testTracer.scopeFor(result, 'foo2').__location.end.line).toEqual(4);
+    });
 });
 
 xit("blah", function() {

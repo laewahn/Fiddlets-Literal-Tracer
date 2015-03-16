@@ -2,14 +2,14 @@ var esprima = require('esprima');
 var _ = require('lodash');
 
 exports.trace = function(source) {
-  var parsed = esprima.parse(source);
+  var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
-
-  return traceBody(parsed.body)  
+  
+  var tracingResults = {};
+  return traceBody(parsed.body, tracingResults);  
 }
 
-function traceBody(body) {
-  var tracingResults = {};
+function traceBody(body, tracingResults) {
   tracingResults.__scopes = {};
 
   body.forEach(function(line) {
@@ -22,7 +22,11 @@ function traceBody(body) {
         break;
       case "FunctionDeclaration":
         tracingResults[line.id.name] = new Function();
-        tracingResults.__scopes[line.id.name] = traceBody(line.body.body);
+        
+        var newScope = {};
+        traceBody(line.body.body, newScope);
+        tracingResults.__scopes[line.id.name] = newScope;
+        tracingResults.__scopes[line.id.name].__location = line.body.loc;
         break;
       case "EmptyStatement":
         break;
