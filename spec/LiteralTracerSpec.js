@@ -305,6 +305,18 @@ describe("For variable declarations inside functions", function() {
         expect(testTracer.scopeFor(result, 'foo2').__location.start.line).toEqual(2);
         expect(testTracer.scopeFor(result, 'foo2').__location.end.line).toEqual(4);
     });
+
+    it("should return the scope for a line", function() {
+        var source =    "function foo() {\n" + 
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}";
+
+        var result = testTracer.trace(source);
+        
+        expect(testTracer.scopeForLine(3, result)).not.toBe(undefined);
+    });
 });
 
 xit("blah", function() {
