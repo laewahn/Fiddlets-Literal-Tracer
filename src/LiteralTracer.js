@@ -39,10 +39,10 @@ function traceBody(body, tracingResults) {
 };
 
 exports.scopeForLine = function(line, tracingResults) {
-  return getScopeByLine(line, tracingResults);
+  return findScopeByLine(line, tracingResults);
 }
 
-function getScopeByLine(line, tracingResults) {
+function findScopeByLine(line, tracingResults) {
   var bestCandidate = null;
   Object.keys(tracingResults.__scopes).forEach(function(scopeName) {
 
@@ -52,17 +52,17 @@ function getScopeByLine(line, tracingResults) {
       bestCandidate = nextScope;
     }
     
-    bestCandidate = getScopeByLine(line, nextScope) || bestCandidate;
+    bestCandidate = findScopeByLine(line, nextScope) || bestCandidate;
   });
 
   return bestCandidate;
 }
 
-exports.scopeFor = function(tracingResults, functionName) {
-  return functionName ? getScope(tracingResults, functionName) : tracingResults;
+exports.scopeByName = function(functionName, tracingResults) {
+  return functionName ? findScopeByName(functionName, tracingResults) : tracingResults;
 }
 
-function getScope(tracingResults, functionName) {
+function findScopeByName(functionName, tracingResults) {
 
   var returnValue;
   var nestedScopes = tracingResults.__scopes;
@@ -72,7 +72,7 @@ function getScope(tracingResults, functionName) {
   } else {
     Object.keys(nestedScopes).forEach(function(scopeName) {
       var nextScope = nestedScopes[scopeName];
-      returnValue = getScope(nextScope, functionName);
+      returnValue = findScopeByName(functionName, nextScope);
     });
   };
 

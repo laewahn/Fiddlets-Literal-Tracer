@@ -273,21 +273,21 @@ describe("For function declarations", function() {
 });
 
 describe("For variable declarations inside functions", function() {
-    xit("should return a new scoped return object with the variables declared", function() {
+    it("should return a new scoped return object with the variables declared", function() {
         var source = "function foo() { var bar = 'asdf'; }";
         var result = testTracer.trace(source);
 
-        expect(testTracer.scopeFor(result, 'foo').bar).toEqual('asdf');
+        expect(testTracer.scopeByName('foo', result).bar).toEqual('asdf');
     });
 
-    xit("should return the scope for nested functions", function() {
+    it("should return the scope for nested functions", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
     
-        expect(testTracer.scopeFor(result, 'foo2').bar).toEqual('asdf'); 
+        expect(testTracer.scopeByName('foo2', result).bar).toEqual('asdf'); 
     });
 
-    xit("should have location information for the scopes", function() {
+    it("should have location information for the scopes", function() {
         var source =    "function foo() {\n" + 
                         "   function foo2() {\n" + 
                         "        var bar = 'asdf';\n" + 
@@ -296,14 +296,14 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
     
-        expect(testTracer.scopeFor(result, 'foo').__location).not.toBe(undefined);
-        expect(testTracer.scopeFor(result, 'foo').__location).not.toBe(null);
+        expect(testTracer.scopeByName('foo', result).__location).not.toBe(undefined);
+        expect(testTracer.scopeByName('foo', result).__location).not.toBe(null);
     
-        expect(testTracer.scopeFor(result, 'foo').__location.start.line).toEqual(1);
-        expect(testTracer.scopeFor(result, 'foo').__location.end.line).toEqual(5);
+        expect(testTracer.scopeByName('foo', result).__location.start.line).toEqual(1);
+        expect(testTracer.scopeByName('foo', result).__location.end.line).toEqual(5);
 
-        expect(testTracer.scopeFor(result, 'foo2').__location.start.line).toEqual(2);
-        expect(testTracer.scopeFor(result, 'foo2').__location.end.line).toEqual(4);
+        expect(testTracer.scopeByName('foo2', result).__location.start.line).toEqual(2);
+        expect(testTracer.scopeByName('foo2', result).__location.end.line).toEqual(4);
     });
 
     it("should return the scope for a line", function() {
@@ -317,8 +317,8 @@ describe("For variable declarations inside functions", function() {
 
         expect(testTracer.scopeForLine(3, result)).not.toBe(undefined);
         expect(testTracer.scopeForLine(100, result)).toBe(null);
-        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeFor(result, 'foo'));
-        expect(testTracer.scopeForLine(3, result)).toBe(testTracer.scopeFor(result, 'foo2'));
+        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeByName('foo', result));
+        expect(testTracer.scopeForLine(3, result)).toBe(testTracer.scopeByName('foo2', result));
     });
 });
 
