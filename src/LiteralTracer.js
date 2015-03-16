@@ -95,7 +95,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     default:
-      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+      throw new Error("Unsupported type: " + initialization.type + "in\n" + JSON.stringify(initialization, null, 2));
   }
 } 
 
@@ -115,7 +115,7 @@ function evaluateBinaryExpression(expression, tracingResults) {
     case "%" :
       return lValue % rValue;
     default:
-      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+      throw new Error("Unsupported operator: " + expression.operator + "in\n" + JSON.stringify(expression, null, 2));
   }
 }
 
@@ -132,7 +132,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
     default:  
-      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+      throw new Error("Unsupported type: " + identifierOrLiteral.type + "in\n" + JSON.stringify(identifierOrLiteral, null, 2));
   }
 }
 
@@ -140,7 +140,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
   } else {
-    throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+    throw new Error("Unsupported type: " + expression.type + "in\n" + JSON.stringify(expression, null, 2));
   }
 }
 
