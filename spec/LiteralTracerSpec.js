@@ -3,7 +3,7 @@ var testTracer = require('../src/LiteralTracer.js');
 describe("For literal assignments" , function() {
     describe("given a line of code that assigns a literal to a variable", function() {
         it("returns an object with the literal accessible by its variable name", function() {
-            expect(testTracer.trace("var something = [4, 3, 6];")).toEqual({something: [4, 3, 6]});
+            expect(testTracer.trace("var something = [4, 3, 6];").something).toEqual([4, 3, 6]);
             expect(testTracer.trace("var someInt = 6;").someInt).toEqual(6);
             expect(testTracer.trace("var someObj = {foo: 'bar'};").someObj).toEqual({foo: "bar"});
             expect(testTracer.trace("var someChar = 'x';").someChar).toEqual('x');
@@ -269,6 +269,22 @@ describe("For function declarations", function() {
         var result = testTracer.trace(source);
 
         expect(result.Cursor.prototype.view).toEqual('someView');
+    });
+});
+
+describe("For variable declarations inside functions", function() {
+    it("should return a new scoped return object with the variables declared", function() {
+        var source = "function foo() { var bar = 'asdf'; }";
+        var result = testTracer.trace(source);
+
+        expect(testTracer.scopeFor(result, 'foo').bar).toEqual('asdf');
+    });
+
+    it("should return the scope for nested functions", function() {
+        var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
+        var result = testTracer.trace(source);
+    
+        expect(testTracer.scopeFor(result, 'foo2').bar).toEqual('asdf'); 
     });
 });
 

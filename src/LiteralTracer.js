@@ -2,33 +2,58 @@ var esprima = require('esprima');
 var _ = require('lodash');
 
 exports.trace = function(source) {
-    var parsed = esprima.parse(source);
-    // console.log(JSON.stringify(parsed, null, 2));
+  var parsed = esprima.parse(source);
+  // console.log(JSON.stringify(parsed, null, 2));
 
-    var tracingResults = {};
+  return traceBody(parsed.body)  
+}
+
+function traceBody(body) {
+  var tracingResults = {};
+  tracingResults.__scopes = {};
+
+  body.forEach(function(line) {
+    switch(line.type) {
+      case "VariableDeclaration": 
+        evaluateVariableDeclaration(line.declarations, tracingResults);         
+        break;
+      case "ExpressionStatement":
+        evaluateExpressionStatement(line.expression, tracingResults);
+        break;
+      case "FunctionDeclaration":
+        tracingResults[line.id.name] = new Function();
+        tracingResults.__scopes[line.id.name] = traceBody(line.body.body);
+        break;
+      case "EmptyStatement":
+        break;
+      default:
+        throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+    }
+  });
     
-    parsed.body.forEach(function(line) {
-      switch(line.type) {
-        case "VariableDeclaration": 
-          evaluateVariableDeclaration(line.declarations, tracingResults);         
-          break;
-        case "ExpressionStatement":
-          evaluateExpressionStatement(line.expression, tracingResults);
-          break;
-        case "FunctionDeclaration":
-          // console.log(JSON.stringify(line, null, 2));
-          tracingResults[line.id.name] = new Function();
-          break;
-        case "EmptyStatement":
-          break;
-        default:
-          // console.log(JSON.stringify(line, null, 2));
-          throw new Error("Unsupported type: " + line.type);
-      }
-    });
-    
-    return tracingResults; 
+  return tracingResults; 
 };
+
+exports.scopeFor = function(tracingResults, functionName) {
+  return functionName ? getScope(tracingResults, functionName) : tracingResults;
+}
+
+function getScope(tracingResults, functionName) {
+
+  var returnValue;
+  var nestedScopes = tracingResults.__scopes;
+
+  if (nestedScopes[functionName]) {
+    returnValue = nestedScopes[functionName];
+  } else {
+    Object.keys(nestedScopes).forEach(function(scopeName) {
+      var nextScope = nestedScopes[scopeName];
+      returnValue = getScope(nextScope, functionName);
+    });
+  };
+
+  return returnValue;
+}
 
 function evaluateVariableDeclaration(declarations, tracingResults) {
 
@@ -49,7 +74,6 @@ function declareVariable(declaration, tracingResults) {
 }
 
 function initializeVariable(variableName, initialization, tracingResults) {
-  // console.log(JSON.stringify(initialization, null, 2));
   switch(initialization.type) {
     case "ArrayExpression" :
       tracingResults[variableName] = elementsOf(initialization);    
@@ -71,8 +95,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     default:
-      // console.log(JSON.stringify(initialization, null, 2));
-      throw new Error("Unsupported type: " + line.type);
+      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
   }
 } 
 
@@ -92,8 +115,7 @@ function evaluateBinaryExpression(expression, tracingResults) {
     case "%" :
       return lValue % rValue;
     default:
-      // console.log(JSON.stringify(expression, null, 2));
-      throw new Error("Unsupported type: " + line.type);
+      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
   }
 }
 
@@ -110,8 +132,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
     default:  
-      // console.log(JSON.stringify(identifierOrLiteral, null, 2));
-      throw new Error("Unsupported type: " + identifierOrLiteral.type);
+      throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
   }
 }
 
@@ -119,8 +140,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
   } else {
-    // console.log(JSON.stringify(expression, null, 2));
-    throw new Error("Unsupported type: " + line.type);
+    throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
   }
 }
 
