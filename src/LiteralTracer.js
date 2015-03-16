@@ -38,6 +38,26 @@ function traceBody(body, tracingResults) {
   return tracingResults; 
 };
 
+exports.scopeForLine = function(line, tracingResults) {
+  return getScopeByLine(line, tracingResults);
+}
+
+function getScopeByLine(line, tracingResults) {
+  var bestCandidate = null;
+  Object.keys(tracingResults.__scopes).forEach(function(scopeName) {
+
+    var nextScope = tracingResults.__scopes[scopeName];
+
+    if (nextScope.__location.start.line < line && line < nextScope.__location.end.line) {
+      bestCandidate = nextScope;
+    }
+    
+    bestCandidate = getScopeByLine(line, nextScope) || bestCandidate;
+  });
+
+  return bestCandidate;
+}
+
 exports.scopeFor = function(tracingResults, functionName) {
   return functionName ? getScope(tracingResults, functionName) : tracingResults;
 }

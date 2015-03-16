@@ -273,21 +273,21 @@ describe("For function declarations", function() {
 });
 
 describe("For variable declarations inside functions", function() {
-    it("should return a new scoped return object with the variables declared", function() {
+    xit("should return a new scoped return object with the variables declared", function() {
         var source = "function foo() { var bar = 'asdf'; }";
         var result = testTracer.trace(source);
 
         expect(testTracer.scopeFor(result, 'foo').bar).toEqual('asdf');
     });
 
-    it("should return the scope for nested functions", function() {
+    xit("should return the scope for nested functions", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
     
         expect(testTracer.scopeFor(result, 'foo2').bar).toEqual('asdf'); 
     });
 
-    it("should have location information for the scopes", function() {
+    xit("should have location information for the scopes", function() {
         var source =    "function foo() {\n" + 
                         "   function foo2() {\n" + 
                         "        var bar = 'asdf';\n" + 
@@ -314,8 +314,11 @@ describe("For variable declarations inside functions", function() {
                         "}";
 
         var result = testTracer.trace(source);
-        
+
         expect(testTracer.scopeForLine(3, result)).not.toBe(undefined);
+        expect(testTracer.scopeForLine(100, result)).toBe(null);
+        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeFor(result, 'foo'));
+        expect(testTracer.scopeForLine(3, result)).toBe(testTracer.scopeFor(result, 'foo2'));
     });
 });
 
