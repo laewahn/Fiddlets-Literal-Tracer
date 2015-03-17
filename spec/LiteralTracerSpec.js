@@ -361,7 +361,6 @@ describe("For variable declarations inside functions", function() {
 
         expect(testTracer.scopeForLine(3, result)).toBeDefined();
         expect(testTracer.scopeForLine(3, result).bar).toEqual('asdf');
-        fail("This can not be the right solution. Must store scopes not by name. Maybe add name to scope and store scopes as array.");
     });
 });
 

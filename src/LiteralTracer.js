@@ -10,7 +10,7 @@ exports.trace = function(source) {
 }
 
 function traceBody(body, tracingResults) {
-  tracingResults.__scopes = {};
+  tracingResults.__scopes = [];
 
   body.forEach(function(line) {
     switch(line.type) {
@@ -25,8 +25,11 @@ function traceBody(body, tracingResults) {
         
         var newScope = {};
         traceBody(line.body.body, newScope);
-        tracingResults.__scopes[line.id.name] = newScope;
-        tracingResults.__scopes[line.id.name].__location = line.body.loc;
+        newScope.__scopeName = line.id.name;
+        newScope.__location = line.body.loc;
+        tracingResults.__scopes.push(newScope);
+        // tracingResults.__scopes[line.id.name] = newScope;
+        // tracingResults.__scopes[line.id.name].__location = line.body.loc;
         break;
       case "EmptyStatement":
         break;
@@ -39,44 +42,31 @@ function traceBody(body, tracingResults) {
 };
 
 exports.scopeForLine = function(line, tracingResults) {
-  return findScopeByLine(line, tracingResults);
-}
-
-function findScopeByLine(line, tracingResults) {
-  var bestCandidate = null;
-  Object.keys(tracingResults.__scopes).forEach(function(scopeName) {
-
-    var nextScope = tracingResults.__scopes[scopeName];
-
-    if (nextScope.__location.start.line < line && line < nextScope.__location.end.line) {
-      bestCandidate = nextScope;
-    }
-    
-    bestCandidate = findScopeByLine(line, nextScope) || bestCandidate;
-  });
-
-  return bestCandidate;
+  return findScopeWith(function(scope) {
+    return scope.__location.start.line < line && line < scope.__location.end.line
+  }, tracingResults);
 }
 
 exports.scopeByName = function(functionName, tracingResults) {
-  return functionName ? findScopeByName(functionName, tracingResults) : tracingResults;
+  return findScopeWith(function(scope) {
+    return scope.__scopeName === functionName;
+  }, tracingResults);
 }
 
-function findScopeByName(functionName, tracingResults) {
+function findScopeWith(evaluationFunction, tracingResults) {
+  var bestCandidate = null;
+  tracingResults.__scopes.forEach(function(scopeName) {
 
-  var returnValue = null;
-  var nestedScopes = tracingResults.__scopes;
+    var nextScope = scopeName;
 
-  if (nestedScopes[functionName]) {
-    returnValue = nestedScopes[functionName];
-  } else {
-    Object.keys(nestedScopes).forEach(function(scopeName) {
-      var nextScope = nestedScopes[scopeName];
-      returnValue = findScopeByName(functionName, nextScope);
-    });
-  };
+    if (evaluationFunction(nextScope) === true) {
+      bestCandidate = nextScope;
+    }
+    
+    bestCandidate = findScopeWith(evaluationFunction, nextScope) || bestCandidate;
+  });
 
-  return returnValue;
+  return bestCandidate;  
 }
 
 function evaluateVariableDeclaration(declarations, tracingResults) {
@@ -123,8 +113,11 @@ function initializeVariable(variableName, initialization, tracingResults) {
       
       var newScope = {};
       traceBody(initialization.body.body, newScope);
-      tracingResults.__scopes[variableName] = newScope;
-      tracingResults.__scopes[variableName].__location = initialization.body.loc;
+      newScope.__scopeName = variableName;
+      newScope.__location = initialization.body.loc;
+      tracingResults.__scopes.push(newScope);
+      // tracingResults.__scopes[variableName] = newScope;
+      // tracingResults.__scopes[variableName].__location = initialization.body.loc;
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
@@ -166,8 +159,10 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "FunctionExpression" :
       var newScope = {};
       traceBody(identifierOrLiteral.body.body, newScope);
-      tracingResults.__scopes["__variableName"] = newScope;
-      tracingResults.__scopes["__variableName"].__location = identifierOrLiteral.body.loc;
+      newScope.__location = identifierOrLiteral.body.loc;
+      tracingResults.__scopes.push(newScope);
+      // tracingResults.__scopes["__variableName"] = newScope;
+      // tracingResults.__scopes["__variableName"].__location = identifierOrLiteral.body.loc;
 
       return new Function();
     default:  
