@@ -31,7 +31,7 @@ function traceBody(body, tracingResults) {
       case "EmptyStatement":
         break;
       default:
-        throw new Error("Unsupported type: " + line.type + "in\n" + JSON.stringify(line, null, 2));
+        // throw new Error("Unsupported type: " + line.type + " in\n" + JSON.stringify(line, null, 2));
     }
   });
     
@@ -118,8 +118,16 @@ function initializeVariable(variableName, initialization, tracingResults) {
     case "BinaryExpression" :
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
+    case "FunctionExpression" :
+      tracingResults[variableName] = new Function();
+      
+      var newScope = {};
+      traceBody(initialization.body.body, newScope);
+      tracingResults.__scopes[variableName] = newScope;
+      tracingResults.__scopes[variableName].__location = initialization.body.loc;
+      break;
     default:
-      throw new Error("Unsupported type: " + initialization.type + "in\n" + JSON.stringify(initialization, null, 2));
+      // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
   }
 } 
 
@@ -139,7 +147,7 @@ function evaluateBinaryExpression(expression, tracingResults) {
     case "%" :
       return lValue % rValue;
     default:
-      throw new Error("Unsupported operator: " + expression.operator + "in\n" + JSON.stringify(expression, null, 2));
+      // throw new Error("Unsupported operator: " + expression.operator + " in\n" + JSON.stringify(expression, null, 2));
   }
 }
 
@@ -155,8 +163,15 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
+    case "FunctionExpression" :
+      var newScope = {};
+      traceBody(identifierOrLiteral.body.body, newScope);
+      tracingResults.__scopes["__variableName"] = newScope;
+      tracingResults.__scopes["__variableName"].__location = identifierOrLiteral.body.loc;
+
+      return new Function();
     default:  
-      throw new Error("Unsupported type: " + identifierOrLiteral.type + "in\n" + JSON.stringify(identifierOrLiteral, null, 2));
+      // throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
   }
 }
 
@@ -164,7 +179,7 @@ function evaluateExpressionStatement(expression, tracingResults) {
   if(expression.type === "AssignmentExpression") {
     evaluateAssignmentExpression(expression, tracingResults);
   } else {
-    throw new Error("Unsupported type: " + expression.type + "in\n" + JSON.stringify(expression, null, 2));
+    // throw new Error("Unsupported type: " + expression.type + " in\n" + JSON.stringify(expression, null, 2));
   }
 }
 

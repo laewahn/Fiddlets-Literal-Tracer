@@ -270,6 +270,23 @@ describe("For function declarations", function() {
 
         expect(result.Cursor.prototype.view).toEqual('someView');
     });
+
+    it("does not fail for functions declared as variables", function() {
+        var source = "var someFunction = function() {var bar = 'asdf'}";
+        var result = testTracer.trace(source);
+
+        expect(result.someFunction).not.toBe(null);
+        expect(typeof(result.someFunction)).toBe('function');
+    });
+
+    it("does not fail for functions declared as prototype members", function() {
+        var source = "function Cursor(){}\nCursor.prototype.fnc = function() {};";
+        var result = testTracer.trace(source);
+
+        expect(result.Cursor.prototype.fnc).toBeDefined();
+        expect(result.Cursor.prototype.fnc).not.toBe(null);
+        expect(typeof(result.Cursor.prototype.fnc)).toBe('function');
+    });
 });
 
 describe("For variable declarations inside functions", function() {
@@ -327,9 +344,28 @@ describe("For variable declarations inside functions", function() {
         expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeByName('foo', result));
         expect(testTracer.scopeForLine(3, result)).toBe(testTracer.scopeByName('foo2', result));
     });
+
+    it("should create scopes for functions declared as variables", function() {
+        var source = "var someFunction = function() {\n var bar = 'asdf';\n}";
+        var result = testTracer.trace(source);
+
+        expect(testTracer.scopeByName('someFunction', result)).toBeDefined();
+        expect(testTracer.scopeByName('someFunction', result)).not.toBe(null);
+        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeByName('someFunction', result));
+        expect(testTracer.scopeForLine(2, result).bar).toEqual('asdf');
+    });
+
+    it("should create scopes for functions declared as prototype members", function() {
+        var source = "function Cursor(){}\nCursor.prototype.fnc = function() {\n var bar = 'asdf'\n};";
+        var result = testTracer.trace(source);
+
+        expect(testTracer.scopeForLine(3, result)).toBeDefined();
+        expect(testTracer.scopeForLine(3, result).bar).toEqual('asdf');
+        fail("This can not be the right solution. Must store scopes not by name. Maybe add name to scope and store scopes as array.");
+    });
 });
 
-xit("blah", function() {
-    var source = "function Cursor() {}; Cursor.prototype.constructor = Cursor; Cursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n";
-    console.log(JSON.stringify(testTracer.trace(source), null, 2));
+it("blah", function() {
+    var source = "function Cursor() {}; Cursor.prototype.constructor = Cursor; Cursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {}/*\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n*/";
+    // console.log(JSON.stringify(testTracer.trace(source), null, 2));
 });
