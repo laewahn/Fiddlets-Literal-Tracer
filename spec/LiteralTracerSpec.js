@@ -380,8 +380,8 @@ describe("For variable declarations inside functions", function() {
                         "}";
         var result = testTracer.trace(source);
 
-        expect(result.tracedValueOfScopeInLine('bar', 4)).toEqual('asdf');
-        expect(result.tracedValueOfScopeInLine('baz', 4)).toEqual('blah');
+        expect(result.scopeForLine(4).tracedValueFor('bar')).toEqual('asdf');
+        expect(result.scopeForLine(4).tracedValueFor('baz')).toEqual('blah');
     });
 
     it("should access the first occurence of a variable in the scope if the variable is overridden", function() {
@@ -394,11 +394,11 @@ describe("For variable declarations inside functions", function() {
                         "}";
         var result = testTracer.trace(source);
         
-        expect(result.tracedValueOfScopeInLine('baz', 4)).toEqual('blah');
+        expect(result.scopeForLine(4).tracedValueFor('baz')).toEqual('blah');
     });
 });
 
-xit("blah", function() {
+it("blah", function() {
     var source = "function Cursor (view) {\r\n\tthis.view = view;\r\n}\r\n\r\nCursor.prototype.constructor = Cursor;\r\nCursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n";
     var result = testTracer.trace(source);
 
