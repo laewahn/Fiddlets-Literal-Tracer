@@ -109,11 +109,11 @@ function initializeVariable(variableName, initialization, tracingResults) {
     case "FunctionExpression" :
       tracingResults[variableName] = new Function();
       
-      var newScope = {};
-      traceBody(initialization.body.body, newScope);
-      newScope.__scopeName = variableName;
-      newScope.__location = initialization.body.loc;
-      tracingResults.__scopes.push(newScope);
+      // var newScope = {};
+      // traceBody(initialization.body.body, newScope);
+      // newScope.__scopeName = variableName;
+      // newScope.__location = initialization.body.loc;
+      // tracingResults.__scopes.push(newScope);
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
@@ -153,10 +153,11 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
     case "FunctionExpression" :
-      var newScope = {};
-      traceBody(identifierOrLiteral.body.body, newScope);
-      newScope.__location = identifierOrLiteral.body.loc;
-      tracingResults.__scopes.push(newScope);
+      // var newScope = {};
+      // traceBody(identifierOrLiteral.body.body, newScope);
+      // newScope.__location = identifierOrLiteral.body.loc;
+      // tracingResults.__scopes.push(newScope);
+      addNewScopeFor(identifierOrLiteral, tracingResults);
       return new Function();
     default:  
       // throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
@@ -187,6 +188,14 @@ function evaluateAssignmentExpression(expression, tracingResults) {
   }
   
   return assignTo;
+}
+
+function addNewScopeFor(something, tracingResults) {
+  var newScope = {};
+      traceBody(something.body.body, newScope);
+      newScope.__location = something.body.loc;
+      newScope.__scopeName = something.id.name || null;
+      tracingResults.__scopes.push(newScope);
 }
 
 function elementsOf(initialization) {
