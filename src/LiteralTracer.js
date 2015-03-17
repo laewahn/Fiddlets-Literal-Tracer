@@ -22,12 +22,7 @@ function traceBody(body, tracingResults) {
         break;
       case "FunctionDeclaration":
         tracingResults[line.id.name] = new Function();
-        
-        var newScope = {};
-        traceBody(line.body.body, newScope);
-        newScope.__scopeName = line.id.name;
-        newScope.__location = line.body.loc;
-        tracingResults.__scopes.push(newScope);
+        addNewNamedScopeFor(line, line.id.name, tracingResults);
         break;
       case "EmptyStatement":
         break;
@@ -108,12 +103,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       break;
     case "FunctionExpression" :
       tracingResults[variableName] = new Function();
-      
-      // var newScope = {};
-      // traceBody(initialization.body.body, newScope);
-      // newScope.__scopeName = variableName;
-      // newScope.__location = initialization.body.loc;
-      // tracingResults.__scopes.push(newScope);
+      addNewNamedScopeFor(initialization, variableName, tracingResults);
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
@@ -153,10 +143,6 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "ObjectExpression" :
       return propertiesOf(identifierOrLiteral);
     case "FunctionExpression" :
-      // var newScope = {};
-      // traceBody(identifierOrLiteral.body.body, newScope);
-      // newScope.__location = identifierOrLiteral.body.loc;
-      // tracingResults.__scopes.push(newScope);
       addNewScopeFor(identifierOrLiteral, tracingResults);
       return new Function();
     default:  
@@ -191,11 +177,15 @@ function evaluateAssignmentExpression(expression, tracingResults) {
 }
 
 function addNewScopeFor(something, tracingResults) {
+  addNewNamedScopeFor(something, null, tracingResults);
+}
+
+function addNewNamedScopeFor(something, name, tracingResults) {
   var newScope = {};
-      traceBody(something.body.body, newScope);
-      newScope.__location = something.body.loc;
-      newScope.__scopeName = something.id.name || null;
-      tracingResults.__scopes.push(newScope);
+  traceBody(something.body.body, newScope);
+  newScope.__location = something.body.loc;
+  newScope.__scopeName = name;
+  tracingResults.__scopes.push(newScope);
 }
 
 function elementsOf(initialization) {
