@@ -372,8 +372,21 @@ describe("For variable declarations inside functions", function() {
                         "   }\n" + 
                         "}";
         var result = testTracer.trace(source);
-        
+
         expect(result.tracedValueOf('bar', 4)).toEqual('asdf');
+        expect(result.tracedValueOf('baz', 4)).toEqual('blah');
+    });
+
+    it("should access the first occurence of a variable in the scope if the variable is overridden", function() {
+        var source =    "var baz = 'notBlah'\n" +
+                        "function foo() {\n" + 
+                        "   var baz = 'blah';\n" +
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}";
+        var result = testTracer.trace(source);
+        
         expect(result.tracedValueOf('baz', 4)).toEqual('blah');
     });
 });
