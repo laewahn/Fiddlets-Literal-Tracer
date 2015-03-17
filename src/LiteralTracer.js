@@ -1,7 +1,13 @@
 var esprima = require('esprima');
 var _ = require('lodash');
 
-exports.trace = function(source) {
+function LiteralTracer() {}
+
+LiteralTracer.prototype.constructor = LiteralTracer;
+LiteralTracer.prototype.trace = 
+
+
+function trace(source) {
   var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
   
@@ -202,3 +208,5 @@ function propertiesOf(initialization, tracingResults) {
     return result;
   }, {});
 }
+
+exports.trace = trace;
