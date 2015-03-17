@@ -1,7 +1,11 @@
 function TracingResults() {}
 
 
-TracingResults.prototype.tracedValueOf = function(variableName, line) {
+TracingResults.prototype.tracedValueFor = function(variableName) {
+  return this[variableName];
+}
+
+TracingResults.prototype.tracedValueOfScopeInLine = function(variableName, line) {
   var theLine = line;
   var theScope = this.scopeForLine(theLine);
   var returnValue = theScope[variableName];
