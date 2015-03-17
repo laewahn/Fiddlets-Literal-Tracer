@@ -28,8 +28,6 @@ function traceBody(body, tracingResults) {
         newScope.__scopeName = line.id.name;
         newScope.__location = line.body.loc;
         tracingResults.__scopes.push(newScope);
-        // tracingResults.__scopes[line.id.name] = newScope;
-        // tracingResults.__scopes[line.id.name].__location = line.body.loc;
         break;
       case "EmptyStatement":
         break;
@@ -116,8 +114,6 @@ function initializeVariable(variableName, initialization, tracingResults) {
       newScope.__scopeName = variableName;
       newScope.__location = initialization.body.loc;
       tracingResults.__scopes.push(newScope);
-      // tracingResults.__scopes[variableName] = newScope;
-      // tracingResults.__scopes[variableName].__location = initialization.body.loc;
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
@@ -161,9 +157,6 @@ function valueFor(identifierOrLiteral, tracingResults) {
       traceBody(identifierOrLiteral.body.body, newScope);
       newScope.__location = identifierOrLiteral.body.loc;
       tracingResults.__scopes.push(newScope);
-      // tracingResults.__scopes["__variableName"] = newScope;
-      // tracingResults.__scopes["__variableName"].__location = identifierOrLiteral.body.loc;
-
       return new Function();
     default:  
       // throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
