@@ -1,13 +1,16 @@
-function TracingResults() {}
+function TracingResults(results) {
+  this.results = results;
+}
 
+TracingResults.prototype.results = undefined;
 
 TracingResults.prototype.tracedValueFor = function(variableName) {
-  return this[variableName];
+  return this.results[variableName];
 }
 
 TracingResults.prototype.tracedValueOfScopeInLine = function(variableName, line) {
   var theLine = line;
-  var theScope = this.scopeForLine(theLine);
+  var theScope = this.scopeForLine(theLine).results;
   var returnValue = theScope[variableName];
   
   while(theScope !== undefined && (returnValue === null || returnValue === undefined)) {
@@ -19,15 +22,15 @@ TracingResults.prototype.tracedValueOfScopeInLine = function(variableName, line)
 }
 
 TracingResults.prototype.scopeForLine = function(line) {
-  return findScopeWith(function(scope) {
+  return new TracingResults(findScopeWith(function(scope) {
     return scope.__location.start.line < line && line < scope.__location.end.line
-  }, this);
+  }, this.results));
 }
 
 TracingResults.prototype.scopeByName = function(functionName) {
-  return findScopeWith(function(scope) {
+  return new TracingResults(findScopeWith(function(scope) {
     return scope.__scopeName === functionName;
-  }, this);
+  }, this.results));
 }
 
 function findScopeWith(evaluationFunction, tracingResults) {

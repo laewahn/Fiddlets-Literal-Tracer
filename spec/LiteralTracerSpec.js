@@ -72,7 +72,7 @@ describe("For assignments of already initialized variables", function() {
             var source = "var first = 42;\nvar second = first;\nvar third = second;";
             var result = testTracer.trace(source);
             expect(result.tracedValueFor('first')).toEqual(42);
-            expect(result.tracedValueFor('third')).toEqual(result.first);
+            expect(result.tracedValueFor('third')).toEqual(result.tracedValueFor('first'));
         });
     });
     
@@ -87,7 +87,7 @@ describe("For assignments of already initialized variables", function() {
         it("sets all the values for multi assignments to a new variable", function() {
             var source = "var a = 'a'\n;var e = 'e'\n; var b, c, d;\na = b = c = d = e;";
             var result = testTracer.trace(source);
-            expect(result.e).toEqual('e');
+            expect(result.tracedValueFor('e')).toEqual('e');
     
             expect(result.tracedValueFor('a')).toEqual('e');
             expect(result.tracedValueFor('b')).toEqual('e');
@@ -224,7 +224,7 @@ describe("For objects", function() {
         var source = "var a = {}, b = { key : 'foo'}; a[b.key] = 'bar'; b.key = 'baz'; a[b.key] = 'asdf';"
         var result = testTracer.trace(source);
 
-        expect(result.a.foo).toEqual("bar");
+        expect(result.tracedValueFor('a').foo).toEqual("bar");
         expect(testTracer.trace(source).tracedValueFor('a').baz).toEqual("asdf"); 
     });
 
@@ -293,7 +293,7 @@ describe("For function declarations", function() {
         var source = "function Something() { \n\tthis.foo = 'bar'\n}";
         var result = testTracer.trace(source);
 
-        expect(result.scopeByName('Something').foo).toEqual('bar');
+        expect(result.scopeByName('Something').tracedValueFor('foo')).toEqual('bar');
     });
 });
 
@@ -302,21 +302,21 @@ describe("For variable declarations inside functions", function() {
         var source = "function foo() { var bar = 'asdf'; }";
         var result = testTracer.trace(source);
 
-        expect(result.scopeByName('foo').bar).toEqual('asdf');
+        expect(result.scopeByName('foo').tracedValueFor('bar')).toEqual('asdf');
     });
 
     it("should return the scope for nested functions", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
     
-        expect(result.scopeByName('foo2').bar).toEqual('asdf'); 
+        expect(result.scopeByName('foo2').tracedValueFor('bar')).toEqual('asdf'); 
     });
 
     it("should return null if the function can not be found", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
         
-        expect(result.scopeByName('asdf')).toBe(null);    
+        expect(result.scopeByName('asdf').results).toBe(null);    
     });
 
     it("should have location information for the scopes", function() {
@@ -328,14 +328,14 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
     
-        expect(result.scopeByName('foo').__location).not.toBe(undefined);
-        expect(result.scopeByName('foo').__location).not.toBe(null);
+        expect(result.scopeByName('foo').results.__location).not.toBe(undefined);
+        expect(result.scopeByName('foo').results.__location).not.toBe(null);
     
-        expect(result.scopeByName('foo').__location.start.line).toEqual(1);
-        expect(result.scopeByName('foo').__location.end.line).toEqual(5);
+        expect(result.scopeByName('foo').results.__location.start.line).toEqual(1);
+        expect(result.scopeByName('foo').results.__location.end.line).toEqual(5);
 
-        expect(result.scopeByName('foo2').__location.start.line).toEqual(2);
-        expect(result.scopeByName('foo2').__location.end.line).toEqual(4);
+        expect(result.scopeByName('foo2').results.__location.start.line).toEqual(2);
+        expect(result.scopeByName('foo2').results.__location.end.line).toEqual(4);
     });
 
     it("should return the scope for a line", function() {
@@ -347,28 +347,28 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
 
-        expect(result.scopeForLine(3)).not.toBe(undefined);
-        expect(result.scopeForLine(100)).toBe(null);
-        expect(result.scopeForLine(2)).toBe(result.scopeByName('foo'));
-        expect(result.scopeForLine(3)).toBe(result.scopeByName('foo2'));
+        expect(result.scopeForLine(3).results).not.toBe(undefined);
+        expect(result.scopeForLine(100).results).toBe(null);
+        expect(result.scopeForLine(2).results).toBe(result.scopeByName('foo').results);
+        expect(result.scopeForLine(3).results).toBe(result.scopeByName('foo2').results);
     });
 
     it("should create scopes for functions declared as variables", function() {
         var source = "var someFunction = function() {\n var bar = 'asdf';\n}";
         var result = testTracer.trace(source);
 
-        expect(result.scopeByName('someFunction')).toBeDefined();
-        expect(result.scopeByName('someFunction')).not.toBe(null);
-        expect(result.scopeForLine(2)).toBe(result.scopeByName('someFunction'));
-        expect(result.scopeForLine(2).bar).toEqual('asdf');
+        expect(result.scopeByName('someFunction').results).toBeDefined();
+        expect(result.scopeByName('someFunction').results).not.toBe(null);
+        expect(result.scopeForLine(2).results).toBe(result.scopeByName('someFunction').results);
+        expect(result.scopeForLine(2).tracedValueFor('bar')).toEqual('asdf');
     });
 
     it("should create scopes for functions declared as prototype members", function() {
         var source = "function Cursor(){}\nCursor.prototype.fnc = function() {\n var bar = 'asdf'\n};";
         var result = testTracer.trace(source);
 
-        expect(result.scopeForLine(3)).toBeDefined();
-        expect(result.scopeForLine(3).bar).toEqual('asdf');
+        expect(result.scopeForLine(3).results).toBeDefined();
+        expect(result.scopeForLine(3).tracedValueFor('bar')).toEqual('asdf');
     });
 
     it("should make variables in the parent scope accessible", function() {
@@ -402,7 +402,7 @@ it("blah", function() {
     var source = "function Cursor (view) {\r\n\tthis.view = view;\r\n}\r\n\r\nCursor.prototype.constructor = Cursor;\r\nCursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n";
     var result = testTracer.trace(source);
 
-    expect(result.Cursor.prototype.startBlinking).toBeDefined();
-    expect(result.scopeForLine(13).that).toBeDefined();
-    expect(result.scopeForLine(13).that).toBe(result.scopeForLine(9).that);
+    expect(result.tracedValueFor('Cursor').prototype.startBlinking).toBeDefined();
+    expect(result.scopeForLine(13).tracedValueFor('that')).toBeDefined();
+    expect(result.scopeForLine(13).tracedValueFor('that')).toBe(result.scopeForLine(9).tracedValueFor('that'));
 });

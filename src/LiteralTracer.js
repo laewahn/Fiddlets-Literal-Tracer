@@ -8,9 +8,10 @@ Tracer.prototype.constructor = Tracer;
 Tracer.prototype.trace = function(source) {
   var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
-  
-  var tracingResults = new tr.TracingResults();
-  return traceBody(parsed.body, tracingResults);  
+  var tracingResults = {};
+  traceBody(parsed.body, tracingResults);
+
+  return new tr.TracingResults(tracingResults);  
 }
 
 function traceBody(body, tracingResults) {
