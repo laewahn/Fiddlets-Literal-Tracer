@@ -1,22 +1,16 @@
 var esprima = require('esprima');
 var _ = require('lodash');
-
-exports.Tracer = Tracer;
+var tr = require('./TracingResults.js');
 
 function Tracer() {}
-
 Tracer.prototype.constructor = Tracer;
 
 Tracer.prototype.trace = function(source) {
   var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
   
-  var tracingResults = new TracingResults();
+  var tracingResults = new tr.TracingResults();
   return traceBody(parsed.body, tracingResults);  
-}
-
-Tracer.prototype.traceBody = function() {
-
 }
 
 function traceBody(body, tracingResults) {
@@ -43,38 +37,6 @@ function traceBody(body, tracingResults) {
     
   return tracingResults; 
 };
-
-
-function TracingResults() {}
-
-TracingResults.prototype.scopeForLine = function(line) {
-  return findScopeWith(function(scope) {
-    return scope.__location.start.line < line && line < scope.__location.end.line
-  }, this);
-}
-
-TracingResults.prototype.scopeByName = function(functionName) {
-  return findScopeWith(function(scope) {
-    return scope.__scopeName === functionName;
-  }, this);
-}
-
-function findScopeWith(evaluationFunction, tracingResults) {
-  var bestCandidate = null;
-  tracingResults.__scopes.forEach(function(scopeName) {
-
-    var nextScope = scopeName;
-
-    if (evaluationFunction(nextScope) === true) {
-      bestCandidate = nextScope;
-    }
-    
-    bestCandidate = findScopeWith(evaluationFunction, nextScope) || bestCandidate;
-  });
-
-  return bestCandidate;  
-}
-
 
 function evaluateVariableDeclaration(declarations, tracingResults) {
 
@@ -199,6 +161,7 @@ function addNewNamedScopeFor(something, name, tracingResults) {
   traceBody(something.body.body, newScope);
   newScope.__location = something.body.loc;
   newScope.__scopeName = name;
+  newScope.__parentScope = tracingResults;
   tracingResults.__scopes.push(newScope);
 }
 
@@ -217,3 +180,4 @@ function propertiesOf(initialization, tracingResults) {
   }, {});
 }
 
+exports.Tracer = Tracer;

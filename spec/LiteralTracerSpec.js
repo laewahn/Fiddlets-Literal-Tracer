@@ -363,6 +363,19 @@ describe("For variable declarations inside functions", function() {
         expect(result.scopeForLine(3)).toBeDefined();
         expect(result.scopeForLine(3).bar).toEqual('asdf');
     });
+
+    it("should make variables in the parent scope accessible", function() {
+        var source =    "function foo() {\n" + 
+                        "   var baz = 'blah';\n" +
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}";
+        var result = testTracer.trace(source);
+        
+        expect(result.tracedValueOf('bar', 4)).toEqual('asdf');
+        expect(result.tracedValueOf('baz', 4)).toEqual('blah');
+    });
 });
 
 it("blah", function() {
