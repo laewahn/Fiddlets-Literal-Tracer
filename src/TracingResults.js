@@ -5,12 +5,20 @@ function TracingResults(results) {
 TracingResults.prototype.results = undefined;
 
 TracingResults.prototype.tracedValueFor = function(variableName) {
-  return this.results[variableName];
+  var theScope = this.results;
+  var returnValue;
+  // console.log(theScope.__parentScope);
+
+  while(theScope !== undefined && returnValue === undefined) {
+    returnValue = theScope[variableName];
+    theScope = theScope.__parentScope;
+  }
+
+  return returnValue;
 }
 
 TracingResults.prototype.tracedValueOfScopeInLine = function(variableName, line) {
-  var theLine = line;
-  var theScope = this.scopeForLine(theLine).results;
+  var theScope = this.scopeForLine(line).results;
   var returnValue = theScope[variableName];
   
   while(theScope !== undefined && (returnValue === null || returnValue === undefined)) {

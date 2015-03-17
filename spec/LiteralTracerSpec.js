@@ -398,7 +398,7 @@ describe("For variable declarations inside functions", function() {
     });
 });
 
-it("blah", function() {
+xit("blah", function() {
     var source = "function Cursor (view) {\r\n\tthis.view = view;\r\n}\r\n\r\nCursor.prototype.constructor = Cursor;\r\nCursor.prototype.view = undefined;\r\n\r\nCursor.prototype.startBlinking = function() {\r\n\tvar that = this;\r\n\tsetInterval(function() {\r\n\t\tthat.hide();\r\n\t\tsetTimeout(function() {\r\n\t\t\tthat.show();\r\n\t\t}, 500);\r\n\t},1000)\r\n}\r\n\r\nCursor.prototype.show = function() {\r\n\tthis.view.css({opacity : 1.0});\r\n}\r\n\r\nCursor.prototype.hide = function() {\r\n\tthis.view.css({opacity : 0.0});\r\n}\r\n";
     var result = testTracer.trace(source);
 
