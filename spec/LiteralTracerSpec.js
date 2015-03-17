@@ -1,4 +1,5 @@
-var testTracer = require('../src/LiteralTracer.js');
+var LiteralTracer = require('../src/LiteralTracer.js');
+var testTracer = new LiteralTracer.Tracer();
 
 describe("For literal assignments" , function() {
     describe("given a line of code that assigns a literal to a variable", function() {
@@ -294,21 +295,21 @@ describe("For variable declarations inside functions", function() {
         var source = "function foo() { var bar = 'asdf'; }";
         var result = testTracer.trace(source);
 
-        expect(testTracer.scopeByName('foo', result).bar).toEqual('asdf');
+        expect(result.scopeByName('foo').bar).toEqual('asdf');
     });
 
     it("should return the scope for nested functions", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
     
-        expect(testTracer.scopeByName('foo2', result).bar).toEqual('asdf'); 
+        expect(result.scopeByName('foo2').bar).toEqual('asdf'); 
     });
 
     it("should return null if the function can not be found", function() {
         var source = "function foo() {\n function foo2() {\n var bar = 'asdf';\n}\n}";
         var result = testTracer.trace(source);
         
-        expect(testTracer.scopeByName('asdf', result)).toBe(null);    
+        expect(result.scopeByName('asdf')).toBe(null);    
     });
 
     it("should have location information for the scopes", function() {
@@ -320,14 +321,14 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
     
-        expect(testTracer.scopeByName('foo', result).__location).not.toBe(undefined);
-        expect(testTracer.scopeByName('foo', result).__location).not.toBe(null);
+        expect(result.scopeByName('foo').__location).not.toBe(undefined);
+        expect(result.scopeByName('foo').__location).not.toBe(null);
     
-        expect(testTracer.scopeByName('foo', result).__location.start.line).toEqual(1);
-        expect(testTracer.scopeByName('foo', result).__location.end.line).toEqual(5);
+        expect(result.scopeByName('foo').__location.start.line).toEqual(1);
+        expect(result.scopeByName('foo').__location.end.line).toEqual(5);
 
-        expect(testTracer.scopeByName('foo2', result).__location.start.line).toEqual(2);
-        expect(testTracer.scopeByName('foo2', result).__location.end.line).toEqual(4);
+        expect(result.scopeByName('foo2').__location.start.line).toEqual(2);
+        expect(result.scopeByName('foo2').__location.end.line).toEqual(4);
     });
 
     it("should return the scope for a line", function() {
@@ -339,28 +340,28 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
 
-        expect(testTracer.scopeForLine(3, result)).not.toBe(undefined);
-        expect(testTracer.scopeForLine(100, result)).toBe(null);
-        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeByName('foo', result));
-        expect(testTracer.scopeForLine(3, result)).toBe(testTracer.scopeByName('foo2', result));
+        expect(result.scopeForLine(3)).not.toBe(undefined);
+        expect(result.scopeForLine(100)).toBe(null);
+        expect(result.scopeForLine(2)).toBe(result.scopeByName('foo'));
+        expect(result.scopeForLine(3)).toBe(result.scopeByName('foo2'));
     });
 
     it("should create scopes for functions declared as variables", function() {
         var source = "var someFunction = function() {\n var bar = 'asdf';\n}";
         var result = testTracer.trace(source);
 
-        expect(testTracer.scopeByName('someFunction', result)).toBeDefined();
-        expect(testTracer.scopeByName('someFunction', result)).not.toBe(null);
-        expect(testTracer.scopeForLine(2, result)).toBe(testTracer.scopeByName('someFunction', result));
-        expect(testTracer.scopeForLine(2, result).bar).toEqual('asdf');
+        expect(result.scopeByName('someFunction')).toBeDefined();
+        expect(result.scopeByName('someFunction')).not.toBe(null);
+        expect(result.scopeForLine(2)).toBe(result.scopeByName('someFunction'));
+        expect(result.scopeForLine(2).bar).toEqual('asdf');
     });
 
     it("should create scopes for functions declared as prototype members", function() {
         var source = "function Cursor(){}\nCursor.prototype.fnc = function() {\n var bar = 'asdf'\n};";
         var result = testTracer.trace(source);
 
-        expect(testTracer.scopeForLine(3, result)).toBeDefined();
-        expect(testTracer.scopeForLine(3, result).bar).toEqual('asdf');
+        expect(result.scopeForLine(3)).toBeDefined();
+        expect(result.scopeForLine(3).bar).toEqual('asdf');
     });
 });
 

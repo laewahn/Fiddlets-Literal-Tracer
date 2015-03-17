@@ -1,18 +1,22 @@
 var esprima = require('esprima');
 var _ = require('lodash');
 
-function LiteralTracer() {}
+exports.Tracer = Tracer;
 
-LiteralTracer.prototype.constructor = LiteralTracer;
-LiteralTracer.prototype.trace = 
+function Tracer() {}
 
+Tracer.prototype.constructor = Tracer;
 
-function trace(source) {
+Tracer.prototype.trace = function(source) {
   var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
   
-  var tracingResults = {};
+  var tracingResults = new TracingResults();
   return traceBody(parsed.body, tracingResults);  
+}
+
+Tracer.prototype.traceBody = function() {
+
 }
 
 function traceBody(body, tracingResults) {
@@ -40,16 +44,19 @@ function traceBody(body, tracingResults) {
   return tracingResults; 
 };
 
-exports.scopeForLine = function(line, tracingResults) {
+
+function TracingResults() {}
+
+TracingResults.prototype.scopeForLine = function(line) {
   return findScopeWith(function(scope) {
     return scope.__location.start.line < line && line < scope.__location.end.line
-  }, tracingResults);
+  }, this);
 }
 
-exports.scopeByName = function(functionName, tracingResults) {
+TracingResults.prototype.scopeByName = function(functionName) {
   return findScopeWith(function(scope) {
     return scope.__scopeName === functionName;
-  }, tracingResults);
+  }, this);
 }
 
 function findScopeWith(evaluationFunction, tracingResults) {
@@ -67,6 +74,7 @@ function findScopeWith(evaluationFunction, tracingResults) {
 
   return bestCandidate;  
 }
+
 
 function evaluateVariableDeclaration(declarations, tracingResults) {
 
@@ -209,4 +217,3 @@ function propertiesOf(initialization, tracingResults) {
   }, {});
 }
 
-exports.trace = trace;
