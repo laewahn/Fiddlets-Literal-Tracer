@@ -121,8 +121,10 @@ function valueFor(identifierOrLiteral, tracingResults) {
     case "FunctionExpression" :
       addNewScopeFor(identifierOrLiteral, tracingResults);
       return new Function();
+    case "ThisExpression" :
+      return tracingResults
     default:  
-      // throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
+      throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
   }
 }
 
