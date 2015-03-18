@@ -295,6 +295,33 @@ describe("For function declarations", function() {
 
         expect(result.scopeByName('Something').tracedValueFor('foo')).toEqual('bar');
     });
+
+    it("creates an executable function for functions with no arguments", function() {
+        var source =    "function helloWorld() {\n" +
+                        "   return \"Hello World\";" +
+                        "}";
+        var result = testTracer.trace(source);
+
+        expect(result.tracedValueFor('helloWorld')).not.toThrow();
+        expect(result.tracedValueFor('helloWorld')()).toEqual("Hello World");
+    });
+
+    it("creates an executable function for functions with arguments", function() {
+        var source =    "function helloWorld(who) {\n" +
+                        "   return \"Hello \" + who;" +
+                        "}";
+        expect(testTracer.trace(source).tracedValueFor('helloWorld')("Foo")).toEqual("Hello Foo");
+
+        source =    "var helloWorld = function(who) {\n" +
+                    "   return \"Hello \" + who;" +
+                    "}";
+        expect(testTracer.trace(source).tracedValueFor('helloWorld')("Foo")).toEqual("Hello Foo");
+
+        source =    "function HelloWorld() {}; HelloWorld.prototype.hello = function(who) {\n" +
+                    "   return \"Hello \" + who;" +
+                    "}";
+        expect(testTracer.trace(source).tracedValueFor('HelloWorld').prototype.hello("Foo")).toEqual("Hello Foo");
+    });
 });
 
 describe("For variable declarations inside functions", function() {
@@ -459,9 +486,14 @@ describe("Exploration tests", function() {
     });
 
     it("Can parse the exampe from the splice demo", function() {
+        var result;
         expect(function() {
-            var source = "function appendBla(entry) {\r\n    return \"_bla\"\r\n}\r\n\r\nfunction prependFoo(value) {\r\n\treturn \"foo_\" + value\r\n};\r\n\r\nvar someValue = 0;\r\nvar index = 2;\r\nvar howMany = 1;\r\nvar anArray = [\"a\", \"b\", \"c\"];\r\nanArray.push(\"d\");";
-            var result = testTracer.trace(source);
+            var source = "function appendBla(entry) {\r\n    return entry + \"_bla\"\r\n}\r\n\r\nfunction prependFoo(value) {\r\n\treturn \"foo_\" + value\r\n};\r\n\r\nvar someValue = 0;\r\nvar index = 2;\r\nvar howMany = 1;\r\nvar anArray = [\"a\", \"b\", \"c\"];\r\nanArray.push(\"d\");";
+            result = testTracer.trace(source);
         }).not.toThrow();
+
+        var assignments = result.allAssignments();
+        var mappedArray = assignments.anArray.map(assignments.appendBla);
+        expect(mappedArray).toEqual(["a_bla", "b_bla", "c_bla"]);
     });
 });

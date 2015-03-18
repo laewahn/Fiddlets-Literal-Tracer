@@ -1,6 +1,7 @@
 var esprima = require('esprima');
 var _ = require('lodash');
 var tr = require('./TracingResults.js');
+var escodegen = require('escodegen');
 
 function Tracer() {}
 Tracer.prototype.constructor = Tracer;
@@ -26,7 +27,12 @@ function traceBody(body, tracingResults) {
         evaluateExpressionStatement(line.expression, tracingResults);
         break;
       case "FunctionDeclaration":
-        tracingResults[line.id.name] = new Function();
+        var params = [];
+        line.params.forEach(function(param) {
+          params.push(param.name);
+        });
+        var functionCode = escodegen.generate(line.body);
+        tracingResults[line.id.name] = new Function(params, functionCode);
         addNewNamedScopeFor(line, line.id.name, tracingResults);
         break;
       case "EmptyStatement":
@@ -79,7 +85,12 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     case "FunctionExpression" :
-      tracingResults[variableName] = new Function();
+      var params = [];
+      initialization.params.forEach(function(param) {
+        params.push(param.name);
+      });
+      var functionCode = escodegen.generate(initialization.body);
+      tracingResults[variableName] = new Function(params, functionCode);
       addNewNamedScopeFor(initialization, variableName, tracingResults);
       break;
     default:
@@ -121,7 +132,12 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return propertiesOf(identifierOrLiteral);
     case "FunctionExpression" :
       addNewScopeFor(identifierOrLiteral, tracingResults);
-      return new Function();
+      var params = [];
+      identifierOrLiteral.params.forEach(function(param) {
+        params.push(param.name);
+      });
+      var functionCode = escodegen.generate(identifierOrLiteral.body);
+      return new Function(params, functionCode);
     case "ThisExpression" :
       return tracingResults
     default:  
