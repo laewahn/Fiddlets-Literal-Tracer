@@ -385,7 +385,7 @@ describe("For variable declarations inside functions", function() {
     });
 
     it("should access the first occurence of a variable in the scope if the variable is overridden", function() {
-        var source =    "var baz = 'notBlah'\n" +
+        var source =    "var baz = 'notBlah';\n" +
                         "function foo() {\n" + 
                         "   var baz = 'blah';\n" +
                         "   function foo2() {\n" + 
@@ -400,7 +400,7 @@ describe("For variable declarations inside functions", function() {
 
 describe("For a given scope of a tracing result", function() {
     it("should give us all available variable assignments", function() {
-        var source =    "var sth = 'sth'\n" +
+        var source =    "var sth = 'sth';\n" +
                         "function foo() {\n" + 
                         "   var baz = 'blah';\n" +
                         "   function foo2() {\n" + 
@@ -418,6 +418,26 @@ describe("For a given scope of a tracing result", function() {
         expect(result.__scopeName).toBeUndefined();
 
         result = testTracer.trace(source).scopeForLine(3).allAssignments();
+        expect(result.bar).toBeUndefined();
+        expect(result.baz).toEqual('blah');
+        expect(result.sth).toEqual('sth');
+    });
+});
+
+describe("For scopes defined in one line", function() {
+    it("can access the scopes by line and column number", function() {
+        var source = "var sth = 'sth';function foo() {var baz = 'blah';function foo2() {var bar = 'asdf';}}";
+        var result = testTracer.trace(source).scopeForPosition(1,72).allAssignments();
+        
+        expect(result.bar).toEqual('asdf');
+        expect(result.baz).toEqual('blah');
+        expect(result.sth).toEqual('sth');
+        
+        expect(result.__location).toBeUndefined();
+        expect(result.__scopes).toBeUndefined();
+        expect(result.__scopeName).toBeUndefined();
+
+        result = testTracer.trace(source).scopeForPosition(1, 47).allAssignments();
         expect(result.bar).toBeUndefined();
         expect(result.baz).toEqual('blah');
         expect(result.sth).toEqual('sth');

@@ -34,6 +34,13 @@ TracingResults.prototype.scopeForLine = function(line) {
   }, this.results));
 }
 
+TracingResults.prototype.scopeForPosition = function(line, column) {
+  return new TracingResults(findScopeWith(function(scope) {
+    return  (scope.__location.start.line <= line && line <= scope.__location.end.line) &&
+            (scope.__location.start.column <= column && column <= scope.__location.end.column)
+  }, this.results));
+}
+
 TracingResults.prototype.scopeByName = function(functionName) {
   return new TracingResults(findScopeWith(function(scope) {
     return scope.__scopeName === functionName;
