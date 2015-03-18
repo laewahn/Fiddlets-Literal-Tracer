@@ -398,6 +398,26 @@ describe("For variable declarations inside functions", function() {
     });
 });
 
+describe("For a given scope of a tracing result", function() {
+    it("should give us all available variable assignments", function() {
+        var source =    "var sth = 'sth'\n" +
+                        "function foo() {\n" + 
+                        "   var baz = 'blah';\n" +
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}";
+        var result = testTracer.trace(source).scopeForLine(5).allAssignments();
+        expect(result.bar).toEqual('asdf');
+        expect(result.baz).toEqual('blah');
+        expect(result.sth).toEqual('sth');
+
+        result = testTracer.trace(source).scopeForLine(3).allAssignments();
+        expect(result.bar).toBeUndefined();
+        expect(result.baz).toEqual('blah');
+        expect(result.sth).toEqual('sth');
+    });
+});
 
 describe("Exploration tests", function() {
     it("Can parse the Cursor example code", function() {

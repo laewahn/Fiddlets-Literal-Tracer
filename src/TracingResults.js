@@ -4,6 +4,22 @@ function TracingResults(results) {
 
 TracingResults.prototype.results = undefined;
 
+TracingResults.prototype.allAssignments = function() {
+  var assignments = {};
+  var theScope = this.results;
+
+  while(theScope !== undefined) {
+    
+    Object.keys(theScope).forEach(function(key){
+      assignments[key] = theScope[key];
+    });
+
+    theScope = theScope.__parentScope;
+  }
+
+  return assignments;  
+}
+
 TracingResults.prototype.tracedValueFor = function(variableName) {
   var theScope = this.results;
   var returnValue;
