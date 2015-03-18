@@ -118,6 +118,15 @@ function evaluateBinaryExpression(expression, tracingResults) {
   }
 }
 
+function functionFor(expression) {
+  var params = [];
+  expression.params.forEach(function(param) {
+    params.push(param.name);
+  });
+  var functionCode = escodegen.generate(expression.body);
+  return new Function(params, functionCode);
+}
+
 function valueFor(identifierOrLiteral, tracingResults) {
   switch(identifierOrLiteral.type) {
     case "Literal" :
@@ -132,12 +141,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return propertiesOf(identifierOrLiteral);
     case "FunctionExpression" :
       addNewScopeFor(identifierOrLiteral, tracingResults);
-      var params = [];
-      identifierOrLiteral.params.forEach(function(param) {
-        params.push(param.name);
-      });
-      var functionCode = escodegen.generate(identifierOrLiteral.body);
-      return new Function(params, functionCode);
+      return functionFor(identifierOrLiteral);
     case "ThisExpression" :
       return tracingResults
     default:  
