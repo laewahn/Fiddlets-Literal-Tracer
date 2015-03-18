@@ -28,16 +28,12 @@ TracingResults.prototype.tracedValueFor = function(variableName) {
   return this.allAssignments()[variableName];
 }
 
-TracingResults.prototype.scopeForLine = function(line) {
-  return new TracingResults(findScopeWith(function(scope) {
-    return scope.__location.start.line < line && line < scope.__location.end.line
-  }, this.results));
-}
-
 TracingResults.prototype.scopeForPosition = function(line, column) {
   return new TracingResults(findScopeWith(function(scope) {
-    return  (scope.__location.start.line <= line && line <= scope.__location.end.line) &&
-            (scope.__location.start.column <= column && column <= scope.__location.end.column)
+    var oneLiner = scope.__location.start.line === scope.__location.end.line;
+
+    return (oneLiner  ? (scope.__location.start.column <= column && column <= scope.__location.end.column)
+                      : (scope.__location.start.line < line && line < scope.__location.end.line));
   }, this.results));
 }
 

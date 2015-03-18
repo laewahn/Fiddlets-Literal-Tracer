@@ -347,10 +347,10 @@ describe("For variable declarations inside functions", function() {
 
         var result = testTracer.trace(source);
 
-        expect(result.scopeForLine(3).results).not.toBe(undefined);
-        expect(result.scopeForLine(100).results).toBe(null);
-        expect(result.scopeForLine(2).results).toBe(result.scopeByName('foo').results);
-        expect(result.scopeForLine(3).results).toBe(result.scopeByName('foo2').results);
+        expect(result.scopeForPosition(3, 1).results).not.toBe(undefined);
+        expect(result.scopeForPosition(100, 1).results).toBe(null);
+        expect(result.scopeForPosition(2, 1).results).toBe(result.scopeByName('foo').results);
+        expect(result.scopeForPosition(3, 1).results).toBe(result.scopeByName('foo2').results);
     });
 
     it("should create scopes for functions declared as variables", function() {
@@ -359,16 +359,16 @@ describe("For variable declarations inside functions", function() {
 
         expect(result.scopeByName('someFunction').results).toBeDefined();
         expect(result.scopeByName('someFunction').results).not.toBe(null);
-        expect(result.scopeForLine(2).results).toBe(result.scopeByName('someFunction').results);
-        expect(result.scopeForLine(2).tracedValueFor('bar')).toEqual('asdf');
+        expect(result.scopeForPosition(2, 1).results).toBe(result.scopeByName('someFunction').results);
+        expect(result.scopeForPosition(2, 1).tracedValueFor('bar')).toEqual('asdf');
     });
 
     it("should create scopes for functions declared as prototype members", function() {
         var source = "function Cursor(){}\nCursor.prototype.fnc = function() {\n var bar = 'asdf'\n};";
         var result = testTracer.trace(source);
 
-        expect(result.scopeForLine(3).results).toBeDefined();
-        expect(result.scopeForLine(3).tracedValueFor('bar')).toEqual('asdf');
+        expect(result.scopeForPosition(3, 1).results).toBeDefined();
+        expect(result.scopeForPosition(3, 1).tracedValueFor('bar')).toEqual('asdf');
     });
 
     it("should make variables in the parent scope accessible", function() {
@@ -380,8 +380,8 @@ describe("For variable declarations inside functions", function() {
                         "}";
         var result = testTracer.trace(source);
 
-        expect(result.scopeForLine(4).tracedValueFor('bar')).toEqual('asdf');
-        expect(result.scopeForLine(4).tracedValueFor('baz')).toEqual('blah');
+        expect(result.scopeForPosition(4, 1).tracedValueFor('bar')).toEqual('asdf');
+        expect(result.scopeForPosition(4, 1).tracedValueFor('baz')).toEqual('blah');
     });
 
     it("should access the first occurence of a variable in the scope if the variable is overridden", function() {
@@ -394,7 +394,7 @@ describe("For variable declarations inside functions", function() {
                         "}";
         var result = testTracer.trace(source);
         
-        expect(result.scopeForLine(4).tracedValueFor('baz')).toEqual('blah');
+        expect(result.scopeForPosition(4, 1).tracedValueFor('baz')).toEqual('blah');
     });
 });
 
@@ -407,7 +407,7 @@ describe("For a given scope of a tracing result", function() {
                         "        var bar = 'asdf';\n" + 
                         "   }\n" + 
                         "}";
-        var result = testTracer.trace(source).scopeForLine(5).allAssignments();
+        var result = testTracer.trace(source).scopeForPosition(5, 1).allAssignments();
         
         expect(result.bar).toEqual('asdf');
         expect(result.baz).toEqual('blah');
@@ -417,7 +417,7 @@ describe("For a given scope of a tracing result", function() {
         expect(result.__scopes).toBeUndefined();
         expect(result.__scopeName).toBeUndefined();
 
-        result = testTracer.trace(source).scopeForLine(3).allAssignments();
+        result = testTracer.trace(source).scopeForPosition(3, 1).allAssignments();
         expect(result.bar).toBeUndefined();
         expect(result.baz).toEqual('blah');
         expect(result.sth).toEqual('sth');
@@ -454,8 +454,8 @@ describe("Exploration tests", function() {
         }).not.toThrow();
 
         expect(result.tracedValueFor('Cursor').prototype.startBlinking).toBeDefined();
-        expect(result.scopeForLine(13).tracedValueFor('that')).toBeDefined();
-        expect(result.scopeForLine(13).tracedValueFor('that')).toBe(result.scopeForLine(9).tracedValueFor('that'));
+        expect(result.scopeForPosition(13, 1).tracedValueFor('that')).toBeDefined();
+        expect(result.scopeForPosition(13, 1).tracedValueFor('that')).toBe(result.scopeForPosition(9, 1).tracedValueFor('that'));
     });
 
     it("Can parse the exampe from the splice demo", function() {
