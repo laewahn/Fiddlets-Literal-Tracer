@@ -27,12 +27,7 @@ function traceBody(body, tracingResults) {
         evaluateExpressionStatement(line.expression, tracingResults);
         break;
       case "FunctionDeclaration":
-        var params = [];
-        line.params.forEach(function(param) {
-          params.push(param.name);
-        });
-        var functionCode = escodegen.generate(line.body);
-        tracingResults[line.id.name] = new Function(params, functionCode);
+        tracingResults[line.id.name] = functionFor(line);
         addNewNamedScopeFor(line, line.id.name, tracingResults);
         break;
       case "EmptyStatement":
@@ -85,12 +80,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     case "FunctionExpression" :
-      var params = [];
-      initialization.params.forEach(function(param) {
-        params.push(param.name);
-      });
-      var functionCode = escodegen.generate(initialization.body);
-      tracingResults[variableName] = new Function(params, functionCode);
+      tracingResults[variableName] = functionFor(initialization);
       addNewNamedScopeFor(initialization, variableName, tracingResults);
       break;
     default:
