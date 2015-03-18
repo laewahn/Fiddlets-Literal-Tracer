@@ -4,6 +4,8 @@ function TracingResults(results) {
 
 TracingResults.prototype.results = undefined;
 
+var INTERNAL_KEYS = ["__location", "__scopes", "__scopeName"];
+
 TracingResults.prototype.allAssignments = function() {
   var assignments = {};
   var theScope = this.results;
@@ -11,7 +13,7 @@ TracingResults.prototype.allAssignments = function() {
   while(theScope !== undefined) {
     
     Object.keys(theScope).forEach(function(key){
-      if (assignments[key] === undefined) {
+      if (assignments[key] === undefined && (INTERNAL_KEYS.indexOf(key) === -1)) {
         assignments[key] = theScope[key];
       }
     });

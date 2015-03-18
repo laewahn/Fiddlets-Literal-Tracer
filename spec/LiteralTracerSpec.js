@@ -408,9 +408,14 @@ describe("For a given scope of a tracing result", function() {
                         "   }\n" + 
                         "}";
         var result = testTracer.trace(source).scopeForLine(5).allAssignments();
+        
         expect(result.bar).toEqual('asdf');
         expect(result.baz).toEqual('blah');
         expect(result.sth).toEqual('sth');
+        
+        expect(result.__location).toBeUndefined();
+        expect(result.__scopes).toBeUndefined();
+        expect(result.__scopeName).toBeUndefined();
 
         result = testTracer.trace(source).scopeForLine(3).allAssignments();
         expect(result.bar).toBeUndefined();
