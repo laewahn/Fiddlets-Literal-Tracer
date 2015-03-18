@@ -11,7 +11,9 @@ TracingResults.prototype.allAssignments = function() {
   while(theScope !== undefined) {
     
     Object.keys(theScope).forEach(function(key){
-      assignments[key] = theScope[key];
+      if (assignments[key] === undefined) {
+        assignments[key] = theScope[key];
+      }
     });
 
     theScope = theScope.__parentScope;
@@ -21,15 +23,7 @@ TracingResults.prototype.allAssignments = function() {
 }
 
 TracingResults.prototype.tracedValueFor = function(variableName) {
-  var theScope = this.results;
-  var returnValue;
-
-  while(theScope !== undefined && returnValue === undefined) {
-    returnValue = theScope[variableName];
-    theScope = theScope.__parentScope;
-  }
-
-  return returnValue;
+  return this.allAssignments()[variableName];
 }
 
 TracingResults.prototype.scopeForLine = function(line) {
