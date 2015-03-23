@@ -16,6 +16,7 @@ Tracer.prototype.trace = function(source) {
 }
 
 function traceBody(body, tracingResults) {
+  // console.log("traceBody called from " + arguments.callee.caller.toString());
   tracingResults.__scopes = [];
 
   body.forEach(function(line) {
@@ -28,6 +29,7 @@ function traceBody(body, tracingResults) {
         break;
       case "FunctionDeclaration":
         addNewNamedScopeFor(line, line.id.name, tracingResults);
+        // console.log("traceBody: Creating function for " + line.id.name);
         tracingResults[line.id.name] = functionFor(line, tracingResults);
         break;
       case "EmptyStatement":
@@ -81,6 +83,7 @@ function initializeVariable(variableName, initialization, tracingResults) {
       break;
     case "FunctionExpression" :
       addNewNamedScopeFor(initialization, variableName, tracingResults);
+      // console.log("initializeVariable: Creating function for " + variableName);
       tracingResults[variableName] = functionFor(initialization, tracingResults);
       break;
     default:
@@ -108,49 +111,20 @@ function evaluateBinaryExpression(expression, tracingResults) {
   }
 }
 
-var INTERNAL_KEYS = ["__location", "__scopes", "__scopeName"];
-
 function functionFor(expression, tracingResults) {
-  var functionScope = {};
-  traceBody(expression.body.body, functionScope);
-  var theScope = tracingResults;
-  var assignmentString = "";
-  console.log(functionScope);
-  while(theScope !== undefined) {
-    Object.keys(theScope).forEach(function(key, idx) {
-      if(INTERNAL_KEYS.indexOf(key) === -1) {
-        var assignmentObject = {"type": "VariableDeclaration",
-            "declarations": [
-                {
-                    "type": "VariableDeclarator",
-                    "id": {
-                        "type": "Identifier",
-                        "name": key
-                    },
-                    "init": {
-                        "type": "Literal",
-                        "value": tracingResults[key],
-                    }
-                }
-            ],
-            "kind": "var"
-        }
-        
-        var assignment = escodegen.generate(assignmentObject);
-        console.log("Generated: " + assignment);
-        assignmentString += assignment;
-      }
+  var functionProxy = function() {
+    
+    var params = [];
+    expression.params.forEach(function(param) {
+      params.push(param.name);
     });
-    theScope = theScope.__parentScope;
-  }
-  console.log("==================");
-  
-  var params = [];
-  expression.params.forEach(function(param) {
-    params.push(param.name);
-  });
-  var functionCode = assignmentString + escodegen.generate(expression.body);
-  return new Function(params, functionCode);
+
+    var functionCode = escodegen.generate(expression.body);
+    var actualFunction = new Function(params, functionCode);
+    return actualFunction.apply(actualFunction, arguments);
+  };
+
+  return functionProxy;
 }
 
 function valueFor(identifierOrLiteral, tracingResults) {
@@ -207,10 +181,10 @@ function addNewScopeFor(something, tracingResults) {
 
 function addNewNamedScopeFor(something, name, tracingResults) {
   var newScope = {};
+  newScope.__parentScope = tracingResults;
   traceBody(something.body.body, newScope);
   newScope.__location = something.body.loc;
   newScope.__scopeName = name;
-  newScope.__parentScope = tracingResults;
   tracingResults.__scopes.push(newScope);
 }
 
