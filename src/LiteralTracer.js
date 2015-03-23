@@ -27,8 +27,8 @@ function traceBody(body, tracingResults) {
         evaluateExpressionStatement(line.expression, tracingResults);
         break;
       case "FunctionDeclaration":
-        tracingResults[line.id.name] = functionFor(line);
         addNewNamedScopeFor(line, line.id.name, tracingResults);
+        tracingResults[line.id.name] = functionFor(line, tracingResults);
         break;
       case "EmptyStatement":
         break;
@@ -80,8 +80,8 @@ function initializeVariable(variableName, initialization, tracingResults) {
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     case "FunctionExpression" :
-      tracingResults[variableName] = functionFor(initialization);
       addNewNamedScopeFor(initialization, variableName, tracingResults);
+      tracingResults[variableName] = functionFor(initialization, tracingResults);
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
@@ -108,12 +108,48 @@ function evaluateBinaryExpression(expression, tracingResults) {
   }
 }
 
-function functionFor(expression) {
+var INTERNAL_KEYS = ["__location", "__scopes", "__scopeName"];
+
+function functionFor(expression, tracingResults) {
+  var functionScope = {};
+  traceBody(expression.body.body, functionScope);
+  var theScope = tracingResults;
+  var assignmentString = "";
+  console.log(functionScope);
+  while(theScope !== undefined) {
+    Object.keys(theScope).forEach(function(key, idx) {
+      if(INTERNAL_KEYS.indexOf(key) === -1) {
+        var assignmentObject = {"type": "VariableDeclaration",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "id": {
+                        "type": "Identifier",
+                        "name": key
+                    },
+                    "init": {
+                        "type": "Literal",
+                        "value": tracingResults[key],
+                    }
+                }
+            ],
+            "kind": "var"
+        }
+        
+        var assignment = escodegen.generate(assignmentObject);
+        console.log("Generated: " + assignment);
+        assignmentString += assignment;
+      }
+    });
+    theScope = theScope.__parentScope;
+  }
+  console.log("==================");
+  
   var params = [];
   expression.params.forEach(function(param) {
     params.push(param.name);
   });
-  var functionCode = escodegen.generate(expression.body);
+  var functionCode = assignmentString + escodegen.generate(expression.body);
   return new Function(params, functionCode);
 }
 
@@ -131,7 +167,7 @@ function valueFor(identifierOrLiteral, tracingResults) {
       return propertiesOf(identifierOrLiteral);
     case "FunctionExpression" :
       addNewScopeFor(identifierOrLiteral, tracingResults);
-      return functionFor(identifierOrLiteral);
+      return functionFor(identifierOrLiteral, tracingResults);
     case "ThisExpression" :
       return tracingResults
     default:  
@@ -166,7 +202,7 @@ function evaluateAssignmentExpression(expression, tracingResults) {
 }
 
 function addNewScopeFor(something, tracingResults) {
-  addNewNamedScopeFor(something, null, tracingResults);
+    addNewNamedScopeFor(something, null, tracingResults);
 }
 
 function addNewNamedScopeFor(something, name, tracingResults) {
