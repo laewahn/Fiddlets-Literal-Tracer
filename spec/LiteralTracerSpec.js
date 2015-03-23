@@ -322,6 +322,13 @@ describe("For function declarations", function() {
                     "}";
         expect(testTracer.trace(source).tracedValueFor('HelloWorld').prototype.hello("Foo")).toEqual("Hello Foo");
     });
+
+    it("copies the literals from outside of the scope of the function into the function", function(){
+        var source = "function a () { \r\n    var greeting = \"Hello \"; \r\n    function b (name) {\r\n        return greeting + name;\r\n    }\r\n}";
+        var result = testTracer.trace(source);
+        console.log(result.scopeForPosition(2, 1));
+        expect(result.scopeForPosition(2, 1).tracedValueFor('b')("world")).toEqual("Hello world");
+    });
 });
 
 describe("For variable declarations inside functions", function() {
