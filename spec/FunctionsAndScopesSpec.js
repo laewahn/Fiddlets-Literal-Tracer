@@ -68,6 +68,15 @@ describe("For function declarations", function() {
 
         var theFunction = result.tracedValueFor('helloWorld');
         expect(result.tracedValueFor('helloWorld')()).toEqual("Hello World");
+
+        source =    "function helloWorldBuilder() {\n" +
+                    "   return function() { \n" +
+                    "       return \"Hello World!\";\n" +
+                    "   } \n" +
+                    "}";
+
+        var builder = testTracer.trace(source).tracedValueFor('helloWorldBuilder')();
+        expect(builder()).toEqual("Hello World!");
     });
 
     it("creates an executable function for functions with arguments", function() {
@@ -82,7 +91,7 @@ describe("For function declarations", function() {
         expect(testTracer.trace(source).tracedValueFor('helloWorld')("Foo")).toEqual("Hello Foo");
 
         source =    "function HelloWorld() {}; HelloWorld.prototype.hello = function(who) {\n" +
-                    "   return \"Hello \" + who;" +
+                    "   return \"Hello \" \n + who;" +
                     "}";
         expect(testTracer.trace(source).tracedValueFor('HelloWorld').prototype.hello("Foo")).toEqual("Hello Foo");
     });
@@ -92,9 +101,9 @@ describe("For function declarations", function() {
         var result = testTracer.trace(source);
         expect(result.scopeForPosition(2, 1).tracedValueFor('b')("world")).toEqual("Hello world");
 
-        source = "var preGreeting = \"Very \"; function a () { \r\n    var greeting = \"Hello \"; \r\n    function b (name) {\r\n        return preGreeting + greeting + name;\r\n    }\r\n}";
+        source = "var greeting = \"Hello \" ;\r\n function a () { \r\n    function b (name) {\r\n        return greeting + name;\r\n    }\r\n}";
         result = testTracer.trace(source);
-        expect(result.scopeForPosition(2,1).tracedValueFor('b')("World")).toEqual("Very Hello world");
+        expect(result.scopeForPosition(3,1).tracedValueFor('b')("World")).toEqual("Hello World");
     });
 });
 

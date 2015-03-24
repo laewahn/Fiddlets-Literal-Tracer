@@ -16,38 +16,42 @@ Tracer.prototype.trace = function(source) {
 }
 
 function traceBody(body, tracingResults) {
-  // console.log("traceBody called from " + arguments.callee.caller.toString());
   tracingResults.__scopes = [];
+  tracingResults.__identifiers = [];
 
   body.forEach(function(line) {
-    switch(line.type) {
-      case "VariableDeclaration": 
-        evaluateVariableDeclaration(line.declarations, tracingResults);         
-        break;
-      case "ExpressionStatement":
-        evaluateExpressionStatement(line.expression, tracingResults);
-        break;
-      case "FunctionDeclaration":
-        addNewNamedScopeFor(line, line.id.name, tracingResults);
-        // console.log("traceBody: Creating function for " + line.id.name);
-        tracingResults[line.id.name] = functionFor(line, tracingResults);
-        break;
-      case "EmptyStatement":
-        break;
-      default:
-        // throw new Error("Unsupported type: " + line.type + " in\n" + JSON.stringify(line, null, 2));
-    }
+    evaluateLine(line, tracingResults);
   });
     
   return tracingResults; 
 };
 
+function evaluateLine(line, tracingResults)
+{
+  switch(line.type) {
+      case "VariableDeclaration": 
+        evaluateVariableDeclaration(line.declarations, tracingResults);         
+        break;
+      case "FunctionDeclaration":
+        var scope = addNewNamedScopeFor(line, line.id.name, tracingResults);
+        tracingResults[line.id.name] = functionFor(line, scope);
+        break;
+      case "ExpressionStatement":
+        evaluateExpressionStatement(line.expression, tracingResults);
+        break;
+      case "ReturnStatement" :
+        evaluateExpressionStatement(line.argument, tracingResults);
+        break;
+      default:
+        // throw new Error("Unsupported type: " + line.type + " in\n" + JSON.stringify(line, null, 2));
+        evaluateExpressionStatement(line, tracingResults);
+    }
+}
+
 function evaluateVariableDeclaration(declarations, tracingResults) {
 
   declarations.forEach(function(declaration) {
-    
     var varName = declareVariable(declaration, tracingResults);
-    
     if (declaration.init != null) {
       initializeVariable(varName, declaration.init, tracingResults);  
     };
@@ -77,83 +81,31 @@ function initializeVariable(variableName, initialization, tracingResults) {
       break;
     case "Identifier" :
       tracingResults[variableName] =  tracingResults[initialization.name];
+      tracingResults.__identifiers.push(initialization.name);
       break;
     case "BinaryExpression" :
       tracingResults[variableName] = evaluateBinaryExpression(initialization, tracingResults);
       break;
     case "FunctionExpression" :
-      addNewNamedScopeFor(initialization, variableName, tracingResults);
-      // console.log("initializeVariable: Creating function for " + variableName);
-      tracingResults[variableName] = functionFor(initialization, tracingResults);
+      var scope = addNewNamedScopeFor(initialization, variableName, tracingResults);
+      tracingResults[variableName] = functionFor(initialization, scope);
       break;
     default:
       // throw new Error("Unsupported type: " + initialization.type + " in\n" + JSON.stringify(initialization, null, 2));
   }
 } 
 
-function evaluateBinaryExpression(expression, tracingResults) {
-  var lValue = valueFor(expression.left, tracingResults);
-  var rValue = valueFor(expression.right, tracingResults);
-
-  switch(expression.operator) {
-    case "+" :
-      return lValue + rValue;
-    case "-" :
-      return lValue - rValue;
-    case "*" :
-      return lValue * rValue;
-    case "/" :
-      return lValue / rValue;
-    case "%" :
-      return lValue % rValue;
-    default:
-      // throw new Error("Unsupported operator: " + expression.operator + " in\n" + JSON.stringify(expression, null, 2));
-  }
-}
-
-function functionFor(expression, tracingResults) {
-  var functionProxy = function() {
-    
-    var params = [];
-    expression.params.forEach(function(param) {
-      params.push(param.name);
-    });
-
-    var functionCode = escodegen.generate(expression.body);
-    var actualFunction = new Function(params, functionCode);
-    return actualFunction.apply(actualFunction, arguments);
-  };
-
-  return functionProxy;
-}
-
-function valueFor(identifierOrLiteral, tracingResults) {
-  switch(identifierOrLiteral.type) {
-    case "Literal" :
-      return identifierOrLiteral.value;
-    case "Identifier" :
-      return tracingResults[identifierOrLiteral.name] || identifierOrLiteral.name;
-    case "BinaryExpression" :
-      return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
-    case "MemberExpression" :
-      return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
-    case "ObjectExpression" :
-      return propertiesOf(identifierOrLiteral);
-    case "FunctionExpression" :
-      addNewScopeFor(identifierOrLiteral, tracingResults);
-      return functionFor(identifierOrLiteral, tracingResults);
-    case "ThisExpression" :
-      return tracingResults
-    default:  
-      throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
-  }
-}
-
 function evaluateExpressionStatement(expression, tracingResults) {
-  if(expression.type === "AssignmentExpression") {
-    evaluateAssignmentExpression(expression, tracingResults);
-  } else {
+  switch(expression.type) {
+    case "AssignmentExpression" :
+      evaluateAssignmentExpression(expression, tracingResults);
+      break;
+    case "BinaryExpression" :
+      evaluateBinaryExpression(expression, tracingResults);
+      break;
+    default:
     // throw new Error("Unsupported type: " + expression.type + " in\n" + JSON.stringify(expression, null, 2));
+      break;
   }
 }
 
@@ -175,8 +127,115 @@ function evaluateAssignmentExpression(expression, tracingResults) {
   return assignTo;
 }
 
+function evaluateBinaryExpression(expression, tracingResults) {
+  var lValue = valueFor(expression.left, tracingResults);
+  var rValue = valueFor(expression.right, tracingResults);
+
+  switch(expression.operator) {
+    case "+" :
+      return lValue + rValue;
+    case "-" :
+      return lValue - rValue;
+    case "*" :
+      return lValue * rValue;
+    case "/" :
+      return lValue / rValue;
+    case "%" :
+      return lValue % rValue;
+    default:
+      // throw new Error("Unsupported operator: " + expression.operator + " in\n" + JSON.stringify(expression, null, 2));
+  }
+}
+
+function functionFor(expression, scope) {
+  
+  var functionProxy = function() {
+
+    var params = [];
+    expression.params.forEach(function(param) {
+      params.push(param.name);
+    });
+
+    var functionTrace = {};
+    traceBody(expression.body.body, functionTrace);
+    
+    functionTrace.__identifiers.forEach(function(identifier) {
+      if (functionTrace[identifier] === undefined && params.indexOf(identifier) === -1) {
+        var parentDefinition = findIdentifierInScope(identifier, scope);
+
+        var missingPiece = 
+          {
+            "type": "VariableDeclaration",
+            "declarations": [
+                {
+                    "type": "VariableDeclarator",
+                    "id": {
+                        "type": "Identifier",
+                        "name": identifier
+                    },
+                    "init": {
+                        "type": "Literal",
+                        "value": parentDefinition,
+                    }
+                }
+            ],
+            "kind": "var"
+          }
+        expression.body.body.unshift(missingPiece);
+        
+      };
+    });
+    
+    var functionCode = escodegen.generate(expression.body);
+    var actualFunction = new Function(params, functionCode);
+    
+    return actualFunction.apply(actualFunction, arguments);
+  };
+
+  return functionProxy;
+}
+
+function findIdentifierInScope(identifier, scope) {
+  
+  var theScope = scope;
+
+  while(theScope !== undefined) {
+    
+    if (theScope[identifier] !== undefined) {
+      return theScope[identifier];
+    };
+
+    theScope = theScope.__parentScope;
+  }
+
+  return null;
+}
+
+function valueFor(identifierOrLiteral, tracingResults) {
+  switch(identifierOrLiteral.type) {
+    case "Literal" :
+      return identifierOrLiteral.value;
+    case "Identifier" :
+      tracingResults.__identifiers.push(identifierOrLiteral.name);
+      return tracingResults[identifierOrLiteral.name] || identifierOrLiteral.name;
+    case "BinaryExpression" :
+      return evaluateBinaryExpression(identifierOrLiteral, tracingResults);
+    case "MemberExpression" :
+      return tracingResults[identifierOrLiteral.object.name][valueFor(identifierOrLiteral.property, tracingResults)];
+    case "ObjectExpression" :
+      return propertiesOf(identifierOrLiteral);
+    case "FunctionExpression" :
+      var scope = addNewScopeFor(identifierOrLiteral, tracingResults);
+      return functionFor(identifierOrLiteral, scope);
+    case "ThisExpression" :
+      return tracingResults
+    default:  
+      // throw new Error("Unsupported type: " + identifierOrLiteral.type + " in\n" + JSON.stringify(identifierOrLiteral, null, 2));
+  }
+}
+
 function addNewScopeFor(something, tracingResults) {
-    addNewNamedScopeFor(something, null, tracingResults);
+    return addNewNamedScopeFor(something, null, tracingResults);
 }
 
 function addNewNamedScopeFor(something, name, tracingResults) {
@@ -186,6 +245,8 @@ function addNewNamedScopeFor(something, name, tracingResults) {
   newScope.__location = something.body.loc;
   newScope.__scopeName = name;
   tracingResults.__scopes.push(newScope);
+
+  return newScope;
 }
 
 function elementsOf(initialization) {
