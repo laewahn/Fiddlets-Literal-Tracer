@@ -173,8 +173,7 @@ describe("For variable declarations inside functions", function() {
         var result = testTracer.trace(source);
 
         expect(result.scopeForPosition(3, 1).results).not.toBe(undefined);
-        expect(result.scopeForPosition(100, 1).results).toBe(null);
-        expect(result.scopeForPosition(2, 1).results).toBe(result.scopeByName('foo').results);
+        expect(result.scopeForPosition(1, 1).results).toBe(result.scopeByName('foo').results);
         expect(result.scopeForPosition(3, 1).results).toBe(result.scopeByName('foo2').results);
     });
 

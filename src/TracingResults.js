@@ -30,9 +30,15 @@ TracingResults.prototype.tracedValueFor = function(variableName) {
 
 TracingResults.prototype.scopeForPosition = function(line, column) {
   return new TracingResults(findScopeWith(function(scope) {
-    var oneLiner = scope.__location.start.line === scope.__location.end.line;
-    return (oneLiner  ? (scope.__location.start.column <= column && column <= scope.__location.end.column)
-                      : (scope.__location.start.line < line && line < scope.__location.end.line));
+    var start = scope.__location.start;
+    var end = scope.__location.end;
+    
+    var insideScope = (start.line <= line && line <= end.line);
+    if (start.line === end.line) {
+      insideScope = (insideScope && start.column < column) && (insideScope && end.column > column);
+    };
+
+    return insideScope; 
   }, this.results));
 }
 
