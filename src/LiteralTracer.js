@@ -161,7 +161,7 @@ function functionFor(expression, scope) {
     
     functionTrace.__identifiers.forEach(function(identifier) {
       if (functionTrace[identifier] === undefined && params.indexOf(identifier) === -1) {
-        var parentDefinition = findIdentifierInScope(identifier, scope);
+        var parentDefinition = findIdentifierInParentScopesOf(scope, identifier);
 
         var missingPiece = 
           {
@@ -195,10 +195,8 @@ function functionFor(expression, scope) {
   return functionProxy;
 }
 
-function findIdentifierInScope(identifier, scope) {
-  
+function findIdentifierInParentScopesOf(scope, identifier) {
   var theScope = scope;
-
   while(theScope !== undefined) {
     
     if (theScope[identifier] !== undefined) {

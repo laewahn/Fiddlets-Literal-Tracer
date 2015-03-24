@@ -4,7 +4,7 @@ function TracingResults(results) {
 
 TracingResults.prototype.results = undefined;
 
-var INTERNAL_KEYS = ["__location", "__scopes", "__scopeName"];
+var INTERNAL_KEYS = ["__location", "__scopes", "__scopeName", "__identifiers"];
 
 TracingResults.prototype.allAssignments = function() {
   var assignments = {};
