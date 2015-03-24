@@ -1,6 +1,21 @@
 var LiteralTracer = require('../src/LiteralTracer.js');
 var testTracer = new LiteralTracer.Tracer();
 
+describe("For global scope", function() {
+    it("should create a scope with no parent", function() {
+        var source = "var foo = 'foo';\nvar bar = 'bar';\n function foobar() {\n\treturn foo + bar;\n}";
+        var result = testTracer.trace(source);
+
+        expect(result.scopeForPosition(3,1).tracedValueFor('foo')).toEqual('foo');
+        expect(result.scopeForPosition(3,1).tracedValueFor('bar')).toEqual('bar');
+        expect(result.scopeForPosition(3,1).tracedValueFor('foobar')()).toEqual('foobar');
+
+        expect(result.scopeForPosition(1,2).tracedValueFor('foo')).toEqual('foo');
+        expect(result.scopeForPosition(1,2).tracedValueFor('bar')).toEqual('bar');
+        expect(result.scopeForPosition(1,2).tracedValueFor('foobar')()).toEqual('foobar');
+    });
+});
+
 describe("For variables in functions", function() {
     it("does not store them in the global scope", function() {
         var source = "function foo() {var a = 2;};";

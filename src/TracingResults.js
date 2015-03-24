@@ -31,7 +31,6 @@ TracingResults.prototype.tracedValueFor = function(variableName) {
 TracingResults.prototype.scopeForPosition = function(line, column) {
   return new TracingResults(findScopeWith(function(scope) {
     var oneLiner = scope.__location.start.line === scope.__location.end.line;
-
     return (oneLiner  ? (scope.__location.start.column <= column && column <= scope.__location.end.column)
                       : (scope.__location.start.line < line && line < scope.__location.end.line));
   }, this.results));
@@ -45,6 +44,12 @@ TracingResults.prototype.scopeByName = function(functionName) {
 
 function findScopeWith(evaluationFunction, tracingResults) {
   var bestCandidate = null;
+  var nextScope = tracingResults;
+  
+  if(evaluationFunction(tracingResults) === true) {
+    bestCandidate = tracingResults;
+  }
+
   tracingResults.__scopes.forEach(function(scopeName) {
 
     var nextScope = scopeName;

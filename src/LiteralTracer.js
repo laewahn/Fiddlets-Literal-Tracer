@@ -9,7 +9,7 @@ Tracer.prototype.constructor = Tracer;
 Tracer.prototype.trace = function(source) {
   var parsed = esprima.parse(source, {loc : true});
   // console.log(JSON.stringify(parsed, null, 2));
-  var tracingResults = {};
+  var tracingResults = { __location : parsed.loc };
   traceBody(parsed.body, tracingResults);
 
   return new tr.TracingResults(tracingResults);  
@@ -188,7 +188,7 @@ function functionFor(expression, scope) {
     
     var functionCode = escodegen.generate(expression.body);
     var actualFunction = new Function(params, functionCode);
-    
+
     return actualFunction.apply(actualFunction, arguments);
   };
 
