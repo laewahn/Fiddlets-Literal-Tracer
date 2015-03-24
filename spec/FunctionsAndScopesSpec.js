@@ -173,7 +173,7 @@ describe("For variable declarations inside functions", function() {
         var result = testTracer.trace(source);
 
         expect(result.scopeForPosition(3, 1).results).not.toBe(undefined);
-        expect(result.scopeForPosition(1, 1).results).toBe(result.scopeByName('foo').results);
+        expect(result.scopeForPosition(2, 1).results).toBe(result.scopeByName('foo').results);
         expect(result.scopeForPosition(3, 1).results).toBe(result.scopeByName('foo2').results);
     });
 
@@ -265,5 +265,38 @@ describe("For scopes defined in one line", function() {
         expect(result.bar).toBeUndefined();
         expect(result.baz).toEqual('blah');
         expect(result.sth).toEqual('sth');
+    });
+});
+
+describe("For multiline programs", function() {
+    it("finds the right scope", function() {
+        var source =    "var sth = 'sth';\n" +
+                        "function foo() {\n" + 
+                        "   var baz = 'blah';\n" +
+                        "   function foo2() {\n" + 
+                        "        var bar = 'asdf';\n" + 
+                        "   }\n" + 
+                        "}\n" +
+                        "var blubb;\n";
+        var result = testTracer.trace(source);
+
+        expect(result.scopeForPosition(1,1).results.__scopeName).toBeUndefined();
+        expect(result.scopeForPosition(1,1).tracedValueFor('sth')).toEqual('sth');
+        
+        expect(result.scopeForPosition(2,1).results.__scopeName).toBeUndefined();
+        expect(result.scopeForPosition(2,15).results.__scopeName).toBeUndefined();
+        expect(result.scopeForPosition(2,16).results.__scopeName).toEqual('foo');
+
+        expect(result.scopeForPosition(4,1).results.__scopeName).toEqual('foo');
+        expect(result.scopeForPosition(4,19).results.__scopeName).toEqual('foo');
+        expect(result.scopeForPosition(4,20).results.__scopeName).toEqual('foo2');
+
+        expect(result.scopeForPosition(5,4).results.__scopeName).toEqual('foo2');
+        expect(result.scopeForPosition(6,3).results.__scopeName).toEqual('foo2');
+        expect(result.scopeForPosition(6,4).results.__scopeName).toEqual('foo');
+
+        expect(result.scopeForPosition(7,0).results.__scopeName).toEqual('foo');
+        expect(result.scopeForPosition(7,1).results.__scopeName).toBeUndefined();
+        expect(result.scopeForPosition(8,0).results.__scopeName).toBeUndefined();
     });
 });

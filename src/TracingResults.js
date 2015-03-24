@@ -33,12 +33,19 @@ TracingResults.prototype.scopeForPosition = function(line, column) {
     var start = scope.__location.start;
     var end = scope.__location.end;
     
-    var insideScope = (start.line <= line && line <= end.line);
     if (start.line === end.line) {
-      insideScope = (insideScope && start.column < column) && (insideScope && end.column > column);
-    };
+      return start.column < column && end.column > column;
+    }
 
-    return insideScope; 
+    if(start.line === line) {
+      return start.column < column;
+    }
+
+    if(end.line === line) {
+      return end.column > column;
+    }
+
+    return (start.line < line && line < end.line); 
   }, this.results));
 }
 
