@@ -277,7 +277,7 @@ describe("For multiline programs", function() {
                         "        var bar = 'asdf';\n" + 
                         "   }\n" + 
                         "}\n" +
-                        "var blubb;\n";
+                        "var blubb;\n\n\n";
         var result = testTracer.trace(source);
 
         expect(result.scopeForPosition(1,1).results.__scopeName).toBeUndefined();
@@ -298,5 +298,8 @@ describe("For multiline programs", function() {
         expect(result.scopeForPosition(7,0).results.__scopeName).toEqual('foo');
         expect(result.scopeForPosition(7,1).results.__scopeName).toBeUndefined();
         expect(result.scopeForPosition(8,0).results.__scopeName).toBeUndefined();
+
+        expect(result.scopeForPosition(10,0).results).not.toBe(null);
+        expect(result.scopeForPosition(10,0).results).toBe(result.scopeForPosition(7,1).results);
     });
 });
