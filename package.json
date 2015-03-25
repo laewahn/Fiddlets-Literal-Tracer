@@ -12,5 +12,9 @@
     "devDependencies" : {
 
     },
-    "main" : "LiteralTracer.js"
+    "main" : "LiteralTracer.js",
+    "repository" : {
+        "type" : "git",
+        "url" : "ssh://oliver.informatik.rwth-aachen.de/Public/Reseach%20Projects/Live%20Coding/Source/Lewandowski_LiteralTracer.git"
+    }
 }
