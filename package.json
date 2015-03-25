@@ -1,0 +1,16 @@
+{
+    "name" : "LiteralTracer",
+    "version" : "0.0.1",
+    "description" : "Traces literal assignments throughout the code, using static analysis",
+    "author" : "Dennis Lewandowski",
+    "engine" : "node >= 0.10.x",
+    "dependencies" : {
+        "lodash" : "2.4.x",
+        "escodegen" : "1.6.x",
+        "esprima" : "1.2.x"
+    }, 
+    "devDependencies" : {
+
+    },
+    "main" : "LiteralTracer.js"
+}
