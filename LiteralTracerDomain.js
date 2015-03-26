@@ -14,7 +14,8 @@
 	}
 
 	function assignmentsOfScopeForPositionCmd(line, column) {
-		return {foo : "bar_" + line + "_" + column};
+		return lastTrace.scopeForPosition(line, column).allAssignments();
+		// return {foo : "bar_" + line + "_" + column};
 	}
      
     function init(domainManager) {
