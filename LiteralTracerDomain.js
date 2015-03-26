@@ -1,5 +1,5 @@
-// (function() {
-	// "use strict";
+ (function() {
+	 "use strict";
 	
 	var LiteralTracer = require("./lib/LiteralTracer");
 
@@ -7,12 +7,11 @@
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
 
 	function traceCmd(source) {
-		// var tracer = new LiteralTracer.Tracer();
-		// return tracer.trace(source);
-		return {foo : "bar"};
+		 var tracer = new LiteralTracer.Tracer();
+		 return tracer.trace(source);
 	}
-
-	function init(domainManager) {
+     
+    function init(domainManager) {
 		if(!domainManager.hasDomain(LITERAL_TRACER_DOMAIN)) {
 			domainManager.registerDomain(LITERAL_TRACER_DOMAIN, LITERAL_TRACER_VERSION);
 		}
@@ -36,4 +35,4 @@
 	}
 
 	exports.init = init;
-// }());
+ }());
