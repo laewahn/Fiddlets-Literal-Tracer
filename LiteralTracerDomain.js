@@ -13,8 +13,7 @@
 
 	function init(domainManager) {
 		if(!domainManager.hasDomain(LITERAL_TRACER_DOMAIN)) {
-			domainManager.register(	LITERAL_TRACER_DOMAIN, 
-									LITERAL_TRACER_VERSION );
+			domainManager.registerDomain(LITERAL_TRACER_DOMAIN, LITERAL_TRACER_VERSION);
 		}
 
 		domainManager.registerCommand(
