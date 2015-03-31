@@ -2,6 +2,7 @@
 	 "use strict";
 	
 	var LiteralTracer = require("./lib/LiteralTracer");
+	var LineParser = require(".lib/LineParser");
 
 	var LITERAL_TRACER_DOMAIN = "literalTracerDomain";
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
@@ -16,6 +17,10 @@
 	function assignmentsOfScopeForPositionCmd(line, column) {
 		return lastTrace.scopeForPosition(line, column).allAssignments();
 		// return {foo : "bar_" + line + "_" + column};
+	}
+
+	function elementsForLineCmd(line) {
+		return LineParser.parse(line);
 	}
      
     function init(domainManager) {
@@ -54,7 +59,26 @@
 				name: "assignments",
 				type: "object",
 				description: "An object with the values of the assignments indexed by the name of the assignments"
-			}]);
+			}]
+		);
+
+		domainManager.registerCommand(
+			LITERAL_TRACER_DOMAIN,
+			"elementsForLine",
+			elementsForLineCmd,
+			false,
+			"Returns the functions of chained function call",
+			[{
+				name: "line",
+				type: "string",
+				description: "A line of code containing a chained function call"
+			}],
+			[{
+				name: "functions",
+				type: "array",
+				description: "An array containing the functions of the given chain and the object on which they are called"
+			}]
+			)
 	}
 
 	exports.init = init;
