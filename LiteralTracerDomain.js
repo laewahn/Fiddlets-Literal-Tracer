@@ -2,7 +2,7 @@
 	 "use strict";
 	
 	var LiteralTracer = require("./lib/LiteralTracer");
-	var LineParser = require(".lib/LineParser");
+	var LineParser = require("./lib/LineParser");
 
 	var LITERAL_TRACER_DOMAIN = "literalTracerDomain";
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
