@@ -73,7 +73,7 @@ describe("For functions called on some literal", function() {
 	it("should return an array with the initialized string and the name of the function for one function", function() {
 		var source = "'foobar'.indexOf('b');\n";
 		var result = LineParser.parse(source);
-
+		console.log(JSON.stringify(result, null, 2));
 		expect(result.length).toEqual(2);
 		expect(result[0].value).toEqual("foobar");
 		expect(result[1].name).toEqual("indexOf");
