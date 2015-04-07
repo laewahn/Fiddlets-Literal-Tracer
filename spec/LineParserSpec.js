@@ -69,6 +69,15 @@ describe("For functions called on some variable", function(){
 		expect(result[2].loc.start.column).toBe(19);
 		expect(result[2].loc.end.column).toBe(30);
 	});
+
+	it("should return the values of the params for each function call", function() {
+		var source = "anArray.slice(1,2).map(addOne);\n";
+		var result = LineParser.parse(source);
+
+		expect(result[0].params).toEqual([]);
+		expect(result[1].params).toEqual([1,2]);
+		expect(result[2].params).toEqual(["addOne"]);
+	});
 });
 
 describe("For functions called on some literal", function() {
@@ -78,6 +87,13 @@ describe("For functions called on some literal", function() {
 
 		expect(result.length).toEqual(2);
 		expect(result[0].value).toEqual(['a','b','c']);
+		expect(result[1].name).toEqual("slice");
+
+		source = "[foo,'b','c'].slice(1,2);\n";
+		result = LineParser.parse(source);
+
+		expect(result.length).toEqual(2);
+		expect(result[0].value).toEqual(['foo','b','c']);
 		expect(result[1].name).toEqual("slice");
 	});
 
