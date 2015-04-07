@@ -58,6 +58,17 @@ describe("For functions called on some variable", function(){
 		expect(result[2].paramsCount).toEqual(1);
 		expect(result[3].paramsCount).toEqual(3);
 	});
+
+	it("should return the location of the function call", function() {
+		var source = "anArray.slice(1,2).map(addOne);\n";
+		var result = LineParser.parse(source);
+
+		expect(result[1].loc.start.column).toBe(8);
+		expect(result[1].loc.end.column).toBe(18);
+
+		expect(result[2].loc.start.column).toBe(19);
+		expect(result[2].loc.end.column).toBe(30);
+	});
 });
 
 describe("For functions called on some literal", function() {
@@ -73,7 +84,7 @@ describe("For functions called on some literal", function() {
 	it("should return an array with the initialized string and the name of the function for one function", function() {
 		var source = "'foobar'.indexOf('b');\n";
 		var result = LineParser.parse(source);
-		console.log(JSON.stringify(result, null, 2));
+		
 		expect(result.length).toEqual(2);
 		expect(result[0].value).toEqual("foobar");
 		expect(result[1].name).toEqual("indexOf");
