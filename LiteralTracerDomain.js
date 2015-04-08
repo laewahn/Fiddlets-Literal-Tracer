@@ -21,31 +21,28 @@
 
 		lineElements.forEach(function(element){
 			if(lineElements !== undefined && element.name !== undefined) {
-				var assignment = lastTrace.allAssignments()[element.name];
-				if (typeof(assignment) === "function") {
-					assignment = "[Function] " + element.name;
-				}
-
-				if (assignment !== undefined) {
-					element.value = assignment;
-				}
+				substituteIdentifiersWithAssignments(element);
 
 				if (element.params !== undefined) {
 					element.params.forEach(function(param) {
-						var paramAssignment = lastTrace.allAssignments()[param.name];
-						if (typeof(paramAssignment) === "function") {
-							paramAssignment = "[Function] " + param.name;
-						}
-
-						if (paramAssignment !== undefined) {
-							param.value = paramAssignment;
-						}
+						substituteIdentifiersWithAssignments(param);
 					});
 				}
 			}
 		});
 
 		return lineElements;
+	}
+
+	function substituteIdentifiersWithAssignments(element) {
+		var assignment = lastTrace.allAssignments()[element.name];
+		if (typeof(assignment) === "function") {
+			assignment = "[Function] " + element.name;
+		}
+
+		if (assignment !== undefined) {
+			element.value = assignment;
+		}
 	}
      
     function init(domainManager) {
