@@ -77,7 +77,7 @@ describe("For functions called on some variable", function(){
 		expect(result[0].params).toEqual([]);
 		expect(result[1].params[0].value).toEqual(1);
 		expect(result[1].params[1].value).toEqual(2);
-		expect(result[2].params[0].value).toEqual("addOne");
+		expect(result[2].params[0].name).toEqual("addOne");
 	});
 
 	it("should return the position of the params for each function call", function() {
