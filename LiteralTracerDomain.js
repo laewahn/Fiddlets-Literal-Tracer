@@ -31,6 +31,15 @@
 				if (assignment !== undefined) {
 					element.value = assignment;
 				}
+
+				if (element.params !== undefined) {
+					element.params.forEach(function(param) {
+						var paramAssignment = lastTrace.allAssignments()[param.name];
+						if (paramAssignment !== undefined) {
+							param.value = paramAssignment;
+						}
+					});
+				}
 			}
 		});
 
