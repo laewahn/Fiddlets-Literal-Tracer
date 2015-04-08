@@ -52,7 +52,11 @@
 				type: "string",
 				description: "The source to trace"
 			}],
-			[]
+			[{
+				name: "trace",
+				type: "object",
+				description: "Trace results"
+			}]
 		);
 
 		domainManager.registerCommand(
