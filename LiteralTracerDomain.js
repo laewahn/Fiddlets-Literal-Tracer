@@ -12,7 +12,7 @@
 	function traceCmd(source) {
 		 var tracer = new LiteralTracer.Tracer();
 		 lastTrace = tracer.trace(source);
-		 console.log("Last trace: " + JSON.stringify(lastTrace.allAssignments()));
+	
 		 return lastTrace.allAssignments();
 	}
 
@@ -22,7 +22,6 @@
 	}
 
 	function elementsForLineCmd(line) {
-		console.log("Last trace: " + lastTrace);
 		var lineElements = LineParser.parse(line);
 
 		lineElements.forEach(function(element){
