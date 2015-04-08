@@ -12,7 +12,7 @@
 	function traceCmd(source) {
 		 var tracer = new LiteralTracer.Tracer();
 		 lastTrace = tracer.trace(source);
-		 console.log("Last trace: " + JSON.stringify(lastTrace));
+		 console.log("Last trace: " + JSON.stringify(lastTrace.allAssignments()));
 		 return lastTrace.allAssignments();
 	}
 
