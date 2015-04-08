@@ -12,6 +12,7 @@
 	function traceCmd(source) {
 		 var tracer = new LiteralTracer.Tracer();
 		 lastTrace = tracer.trace(source);
+		 console.log("Last trace: " + lastTrace);
 	}
 
 	function assignmentsOfScopeForPositionCmd(line, column) {
@@ -20,6 +21,7 @@
 	}
 
 	function elementsForLineCmd(line) {
+		console.log("Last trace: " + lastTrace);
 		var lineElements = LineParser.parse(line);
 
 		lineElements.foreach(function(element){
