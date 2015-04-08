@@ -20,7 +20,18 @@
 	}
 
 	function elementsForLineCmd(line) {
-		return LineParser.parse(line);
+		var lineElements = LineParser.parse(line);
+
+		lineElements.foreach(function(element){
+			if(lineElements !== undefined && element.name !== undefined) {
+				var assignment = lastTrace.allAssignments()[element.name];
+				if (assignment !== undefined) {
+					element.value = assignment;
+				}
+			}
+		});
+
+		return lineElements;
 	}
      
     function init(domainManager) {
