@@ -13,7 +13,7 @@
 		 var tracer = new LiteralTracer.Tracer();
 		 lastTrace = tracer.trace(source);
 		 console.log("Last trace: " + lastTrace);
-		 return lastTrace;
+		 return "Foo";
 	}
 
 	function assignmentsOfScopeForPositionCmd(line, column) {
