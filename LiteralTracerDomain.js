@@ -12,8 +12,8 @@
 	function traceCmd(source) {
 		 var tracer = new LiteralTracer.Tracer();
 		 lastTrace = tracer.trace(source);
-		 console.log("Last trace: " + lastTrace);
-		 return {foo: "Foo"};
+		 console.log("Last trace: " + JSON.stringify(lastTrace));
+		 return lastTrace.allAssignments();
 	}
 
 	function assignmentsOfScopeForPositionCmd(line, column) {
