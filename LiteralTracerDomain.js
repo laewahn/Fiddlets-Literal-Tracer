@@ -16,11 +16,6 @@
 		 return lastTrace.allAssignments();
 	}
 
-	function assignmentsOfScopeForPositionCmd(line, column) {
-		return lastTrace.scopeForPosition(line, column).allAssignments();
-		// return {foo : "bar_" + line + "_" + column};
-	}
-
 	function elementsForLineCmd(line) {
 		var lineElements = LineParser.parse(line);
 
@@ -72,27 +67,6 @@
 				name: "trace",
 				type: "object",
 				description: "Trace results"
-			}]
-		);
-
-		domainManager.registerCommand(
-			LITERAL_TRACER_DOMAIN,
-			"assignmentsOfScopeForPosition",
-			assignmentsOfScopeForPositionCmd,
-			false,
-			"Returns all assignments that are available for the scope in the given line and column",
-			[{	name: "line",
-				type: "number",
-				description: "The line of the scope"
-			},
-			{	name: "column",
-				type: "number",
-				description: "the column of the scope"
-			}],
-			[{
-				name: "assignments",
-				type: "object",
-				description: "An object with the values of the assignments indexed by the name of the assignments"
 			}]
 		);
 
