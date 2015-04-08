@@ -25,7 +25,7 @@
 		console.log("Last trace: " + lastTrace);
 		var lineElements = LineParser.parse(line);
 
-		lineElements.foreach(function(element){
+		lineElements.forEach(function(element){
 			if(lineElements !== undefined && element.name !== undefined) {
 				var assignment = lastTrace.allAssignments()[element.name];
 				if (assignment !== undefined) {
