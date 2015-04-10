@@ -9,9 +9,9 @@
 
 	var lastTrace;
 
-	function traceCmd(source) {
+	function traceCmd(source, position) {
 		 var tracer = new LiteralTracer.Tracer();
-		 lastTrace = tracer.trace(source);
+		 lastTrace = tracer.trace(source).scopeForPosition(position.line, position.ch);
 	
 		 return lastTrace.allAssignments();
 	}
@@ -44,7 +44,7 @@
 			element.value = assignment;
 		}
 	}
-     
+
     function init(domainManager) {
 		if(!domainManager.hasDomain(LITERAL_TRACER_DOMAIN)) {
 			domainManager.registerDomain(LITERAL_TRACER_DOMAIN, LITERAL_TRACER_VERSION);
@@ -59,6 +59,11 @@
 			[{	name: "source",
 				type: "string",
 				description: "The source to trace"
+			},
+			{
+				name: "position",
+				type: "object",
+				description: "position used to determine the scope for which the values are traced"
 			}],
 			[{
 				name: "trace",
