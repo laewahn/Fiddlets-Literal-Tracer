@@ -50,23 +50,8 @@ describe("For a larger chained call on an array", function() {
 });
 
 describe("Lets build the algorithm for parsing some line of code into the function chain model!", function() {
-	
-	function functionChainFromLine(line) {
-		var LineParser = require('../lib/LineParser');
-		var parsedLine = LineParser.parse(line);
-		var calls = [new fc.ObjectCall(parsedLine[0].name, parsedLine[0].value)];
-
-		parsedLine.slice(1).forEach(function(fn) {
-			calls.push(new fc.FunctionCall(fn.name, fn.params.map(function(e){return e.value})))
-		});
-
-		var chain = new fc.FunctionChain(calls);
-
-		return chain;
-	}
-
 	it("should work for a chain on some literal", function() {
-		var chain = functionChainFromLine("['a','b','c'].splice(1,2);\n");
+		var chain = fc.functionChainFromLine("['a','b','c'].splice(1,2);\n");
 
 		expect(function() {
 			// expected output: ['b', 'c']
@@ -75,7 +60,7 @@ describe("Lets build the algorithm for parsing some line of code into the functi
 		}).not.toThrow();
 
 		
-		chain = functionChainFromLine("['a','b','c'].splice(1,2).reverse();\n");
+		chain = fc.functionChainFromLine("['a','b','c'].splice(1,2).reverse();\n");
 		expect(function() {
 			// expected output: ['c', 'b']
 			var result = chain.executeUntil(2);
