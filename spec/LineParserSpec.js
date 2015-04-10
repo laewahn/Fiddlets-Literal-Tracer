@@ -93,6 +93,15 @@ describe("For functions called on some variable", function(){
 		expect(result[2].params[0].loc.start.column).toEqual(23);
 		expect(result[2].params[0].loc.end.column).toEqual(29);
 	});
+
+	it("should include information about whether something is an object or a function call", function() {
+		var source = "anArray.slice(1,2).map(addOne);\n";
+		var result = LineParser.parse(source);
+
+		expect(result[0].type).toEqual("Identifier");
+		expect(result[1].type).toEqual("CallExpression");
+
+	});
 });
 
 describe("For functions called on some literal", function() {
