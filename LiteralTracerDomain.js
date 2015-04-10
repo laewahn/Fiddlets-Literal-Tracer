@@ -12,9 +12,10 @@
 	function traceCmd(source, position) {
 		console.log(JSON.stringify("Position: " + position));
 		var tracer = new LiteralTracer.Tracer();
-		lastTrace = tracer.trace(source).scopeForPosition(position.line, position.ch);
+		// lastTrace = tracer.trace(source).scopeForPosition(position.line, position.ch);
+		lastTrace = tracer.trace(source);
 		// console.log(JSON.stringify(lastTrace.allAssignments(), null, 2));
-		
+
 		return lastTrace.allAssignments();
 	}
 
