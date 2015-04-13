@@ -98,4 +98,19 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(result).toEqual(['b', 'c']);
 		}).not.toThrow();
 	});
+
+	it("should substitute functions with their implementation", function() {
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "var anArray = ['a','b','c'];\n var index = 1;\nvar count = 2;\n function appendBla(v) { return \"bla_\" + v };";
+		var contextAssignments = tracer.trace(contextCode).allAssignments();
+
+		expect(function() {
+			var chain = fc.functionChainFromLine("anArray.splice(index,count).map(appendBla);\n", contextAssignments);
+			expect(typeof(chain.calls[2].args[0])).toEqual("function");
+
+			var result = chain.executeUntil(2);
+			expect(result).toEqual(['bla_b', 'bla_c']);
+		}).not.toThrow();
+	});
 });
