@@ -49,6 +49,15 @@
 	function executeLineUntilCmd(line, idx) {
 		var chain = fc.functionChainFromLine(line, lastTrace.allAssignments());
 		var returnValue = chain.executeUntil(idx);
+
+		var executionResult = [];
+		chain.calls.forEach(function(e, idx) {
+			executionResult.push({ 
+				'returnValue' : (idx === chain.calls.length -1) ? returnValue : chain.calls[idx + 1].unprocessedInput,
+				'input' : e.unprocessedInput 
+			});
+		});
+
 		return { 'returnValue' : returnValue,
 				 'input' : chain.calls[idx].unprocessedInput };
 	}
@@ -116,8 +125,8 @@
 			}],
 			[{
 				name: "result",
-				type: "object",
-				description: "An object containing the return value of the function execution"
+				type: "array",
+				description: "An array containing the return values of the elements of the function execution"
 			}]
 		);
 	}
