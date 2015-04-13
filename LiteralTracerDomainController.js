@@ -46,20 +46,15 @@
 	exports.executeLineUntilCmd = function(line, executionIdx) {
 		var chain = fc.functionChainFromLine(line, lastTrace.allAssignments());
 		var returnValue = chain.executeUntil(executionIdx);
-		// console.log(JSON.stringify(chain.calls, null, 2));
+		
 		var executionResult = [];
 		chain.calls.slice(0, executionIdx + 1).forEach(function(e, idx) {
-			// console.log("idx: " + idx + "\texecutionIdx: " + executionIdx);
-			var tempResult = { 
+			executionResult.push({ 
 				'returnValue' : (idx >= executionIdx) ? returnValue : chain.calls[idx + 1].unprocessedInput,
 				'input' : e.unprocessedInput 
-			}
-			// console.log(JSON.stringify(e) + "\n=========\n" + JSON.stringify(tempResult) + "\n");
-			executionResult.push(tempResult);
+			});
 		});
 
-		// return { 'returnValue' : returnValue,
-				 // 'input' : chain.calls[idx].unprocessedInput };
 		return executionResult;
 	}
 }())
