@@ -113,4 +113,21 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(result).toEqual(['bla_b', 'bla_c']);
 		}).not.toThrow();
 	});
+
+	it("should include the input for the last evaluated execution step", function() {
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "var anArray = ['a','b','c'];\n var index = 1;\nvar count = 2;\n function appendBla(v) { return \"bla_\" + v };";
+		var contextAssignments = tracer.trace(contextCode).allAssignments();
+
+		expect(function() {
+			var chain = fc.functionChainFromLine("anArray.splice(index,count).map(appendBla).reverse();\n", contextAssignments);
+			expect(chain.calls[2].unprocessedInput).not.toBeDefined();
+
+			var result = chain.executeUntil(3);
+			expect(chain.calls[2].unprocessedInput).toEqual(['b', 'c']);
+			expect(chain.calls[3].unprocessedInput).toEqual(['bla_b', 'bla_c']);
+			expect(result).toEqual(['bla_c', 'bla_b']);
+		}).not.toThrow();
+	});
 });

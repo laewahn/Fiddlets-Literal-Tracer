@@ -49,7 +49,8 @@
 	function executeLineUntilCmd(line, idx) {
 		var chain = fc.functionChainFromLine(line, lastTrace.allAssignments());
 		var returnValue = chain.executeUntil(idx);
-		return { 'returnValue' : returnValue };
+		return { 'returnValue' : returnValue,
+				 'input' : chain.calls[idx].unprocessedInput };
 	}
 
     function init(domainManager) {
