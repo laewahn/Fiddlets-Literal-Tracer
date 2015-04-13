@@ -1,5 +1,8 @@
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global require, exports */
+
 (function(){
-	"use strict"
+	"use strict";
 
 	var lastTrace;
 
@@ -12,7 +15,7 @@
 		lastTrace = tracer.trace(source).scopeForPosition(position.line, position.ch);
 
 		return lastTrace.allAssignments();
-	}
+	};
 
 	exports.elementsForLineCmd = function(line) {
 		var lineElements = LineParser.parse(line);
@@ -30,7 +33,7 @@
 		});
 
 		return lineElements;
-	}
+	};
 
 	function substituteIdentifiersWithAssignments(element) {
 		var assignment = lastTrace.allAssignments()[element.name];
@@ -50,11 +53,12 @@
 		var executionResult = [];
 		chain.calls.slice(0, executionIdx + 1).forEach(function(e, idx) {
 			executionResult.push({ 
-				'returnValue' : (idx >= executionIdx) ? returnValue : chain.calls[idx + 1].unprocessedInput,
-				'input' : e.unprocessedInput 
+				returnValue : (idx >= executionIdx) ? returnValue : chain.calls[idx + 1].unprocessedInput,
+				input : e.unprocessedInput 
 			});
 		});
 
 		return executionResult;
-	}
-}())
+	};
+
+}());

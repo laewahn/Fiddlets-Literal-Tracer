@@ -1,10 +1,13 @@
- (function() {
+/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
+/*global require, exports */
+
+(function() {
 	 "use strict";
 	
 	var LITERAL_TRACER_DOMAIN = "literalTracerDomain";
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
 
-	var LiteralTracerDomainController = require('./literalTracerDomainController');
+	var LiteralTracerDomainController = require("./literalTracerDomainController");
 
     function init(domainManager) {
 		if(!domainManager.hasDomain(LITERAL_TRACER_DOMAIN)) {
@@ -76,4 +79,5 @@
 	}
 
 	exports.init = init;
- }());
+
+}());
