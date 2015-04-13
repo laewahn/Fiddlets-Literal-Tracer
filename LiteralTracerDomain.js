@@ -1,67 +1,10 @@
  (function() {
 	 "use strict";
 	
-	var LiteralTracer = require("./lib/LiteralTracer");
-	var LineParser = require("./lib/LineParser");
-	var fc = require("./lib/FunctionCalling");
-
 	var LITERAL_TRACER_DOMAIN = "literalTracerDomain";
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
 
-	var lastTrace;
-
-	function traceCmd(source, position) {
-		var tracer = new LiteralTracer.Tracer();
-		lastTrace = tracer.trace(source).scopeForPosition(position.line, position.ch);
-
-		return lastTrace.allAssignments();
-	}
-
-	function elementsForLineCmd(line) {
-		var lineElements = LineParser.parse(line);
-
-		lineElements.forEach(function(element){
-			if(lineElements !== undefined && element.name !== undefined) {
-				substituteIdentifiersWithAssignments(element);
-
-				if (element.params !== undefined) {
-					element.params.forEach(function(param) {
-						substituteIdentifiersWithAssignments(param);
-					});
-				}
-			}
-		});
-
-		return lineElements;
-	}
-
-	function substituteIdentifiersWithAssignments(element) {
-		var assignment = lastTrace.allAssignments()[element.name];
-		if (typeof(assignment) === "function") {
-			assignment = "[Function] " + element.name;
-		}
-
-		if (assignment !== undefined) {
-			element.value = assignment;
-		}
-	}
-
-	function executeLineUntilCmd(line, idx) {
-		var chain = fc.functionChainFromLine(line, lastTrace.allAssignments());
-		var returnValue = chain.executeUntil(idx);
-
-		var executionResult = [];
-		chain.calls.forEach(function(e, idx) {
-			executionResult.push({ 
-				'returnValue' : (idx === chain.calls.length -1) ? returnValue : chain.calls[idx + 1].unprocessedInput,
-				'input' : e.unprocessedInput 
-			});
-		});
-
-		// return { 'returnValue' : returnValue,
-				 // 'input' : chain.calls[idx].unprocessedInput };
-		return executionResult;
-	}
+	var LiteralTracerDomainController = require('./literalTracerDomainController');
 
     function init(domainManager) {
 		if(!domainManager.hasDomain(LITERAL_TRACER_DOMAIN)) {
@@ -71,7 +14,7 @@
 		domainManager.registerCommand(
 			LITERAL_TRACER_DOMAIN,
 			"trace",
-			traceCmd,
+			LiteralTracerDomainController.traceCmd,
 			false,
 			"Performs a tracer run on the given source code",
 			[{	name: "source",
@@ -93,7 +36,7 @@
 		domainManager.registerCommand(
 			LITERAL_TRACER_DOMAIN,
 			"elementsForLine",
-			elementsForLineCmd,
+			LiteralTracerDomainController.elementsForLineCmd,
 			false,
 			"Returns the functions of chained function call",
 			[{
@@ -111,7 +54,7 @@
 		domainManager.registerCommand(
 			LITERAL_TRACER_DOMAIN,
 			"executeLineUntil",
-			executeLineUntilCmd,
+			LiteralTracerDomainController.executeLineUntilCmd,
 			false,
 			"Executes the given line of code within the context of the previous tracing results",
 			[{
