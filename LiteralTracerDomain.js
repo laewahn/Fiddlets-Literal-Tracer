@@ -58,8 +58,9 @@
 			});
 		});
 
-		return { 'returnValue' : returnValue,
-				 'input' : chain.calls[idx].unprocessedInput };
+		// return { 'returnValue' : returnValue,
+				 // 'input' : chain.calls[idx].unprocessedInput };
+		return executionResult;
 	}
 
     function init(domainManager) {
