@@ -1,3 +1,7 @@
+/*global require, describe, it, expect */
+
+"use strict";
+
 var domainController = require("../LiteralTracerDomainController.js");
 
 describe("When not completely executing a line", function(){
@@ -16,16 +20,16 @@ describe("When not completely executing a line", function(){
 			expect(result[i].returnValue).toBeDefined("for result[" + i + "]");
 		}
 
-		expect(result[0].returnValue).toEqual(['a','b','c']);
+		expect(result[0].returnValue).toEqual(["a","b","c"]);
 
-		expect(result[1].input).toEqual(['a','b','c']);
-		expect(result[1].returnValue).toEqual(['b','c']);
+		expect(result[1].input).toEqual(["a","b","c"]);
+		expect(result[1].returnValue).toEqual(["b","c"]);
 
-		expect(result[2].input).toEqual(['b','c']);
-		expect(result[2].returnValue).toEqual(['bla_b','bla_c']);
+		expect(result[2].input).toEqual(["b","c"]);
+		expect(result[2].returnValue).toEqual(["bla_b","bla_c"]);
 
-		expect(result[3].input).toEqual(['bla_b','bla_c']);
-		expect(result[3].returnValue).toEqual(['bla_c','bla_b']);
+		expect(result[3].input).toEqual(["bla_b","bla_c"]);
+		expect(result[3].returnValue).toEqual(["bla_c","bla_b"]);
 	});
 
 	it("should return the input and the result of every part of the execution that was actually executed", function() {
@@ -43,12 +47,12 @@ describe("When not completely executing a line", function(){
 			expect(result[i].returnValue).toBeDefined("for result[" + i + "]");
 		}
 
-		expect(result[0].returnValue).toEqual(['a','b','c']);
+		expect(result[0].returnValue).toEqual(["a","b","c"]);
 
-		expect(result[1].input).toEqual(['a','b','c']);
-		expect(result[1].returnValue).toEqual(['b','c']);
+		expect(result[1].input).toEqual(["a","b","c"]);
+		expect(result[1].returnValue).toEqual(["b","c"]);
 
-		expect(result[2].input).toEqual(['b','c']);
-		expect(result[2].returnValue).toEqual(['bla_b','bla_c']);
+		expect(result[2].input).toEqual(["b","c"]);
+		expect(result[2].returnValue).toEqual(["bla_b","bla_c"]);
 	});
 });

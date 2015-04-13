@@ -1,3 +1,7 @@
+/*global require, describe, it, expect */
+
+"use strict";
+
 var LineParser = require("../lib/LineParser");
 
 describe("For functions called on some variable", function(){
@@ -110,14 +114,14 @@ describe("For functions called on some literal", function() {
 		var result = LineParser.parse(source);
 
 		expect(result.length).toEqual(2);
-		expect(result[0].value).toEqual(['a','b','c']);
+		expect(result[0].value).toEqual(["a","b","c"]);
 		expect(result[1].name).toEqual("slice");
 
 		source = "[foo,'b','c'].slice(1,2);\n";
 		result = LineParser.parse(source);
 
 		expect(result.length).toEqual(2);
-		expect(result[0].value).toEqual(['foo','b','c']);
+		expect(result[0].value).toEqual(["foo","b","c"]);
 		expect(result[1].name).toEqual("slice");
 	});
 

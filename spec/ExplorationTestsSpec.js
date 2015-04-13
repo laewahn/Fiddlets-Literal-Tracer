@@ -1,4 +1,8 @@
-var LiteralTracer = require('../lib/LiteralTracer.js');
+/*global require, describe, it, expect */
+
+"use strict";
+
+var LiteralTracer = require("../lib/LiteralTracer.js");
 var testTracer = new LiteralTracer.Tracer();
 
 describe("Exploration tests", function() {
@@ -10,9 +14,9 @@ describe("Exploration tests", function() {
             result = testTracer.trace(source);
         }).not.toThrow();
 
-        expect(result.tracedValueFor('Cursor').prototype.startBlinking).toBeDefined();
-        expect(result.scopeForPosition(13, 1).tracedValueFor('that')).toBeDefined();
-        expect(result.scopeForPosition(13, 1).tracedValueFor('that')).toBe(result.scopeForPosition(9, 1).tracedValueFor('that'));
+        expect(result.tracedValueFor("Cursor").prototype.startBlinking).toBeDefined();
+        expect(result.scopeForPosition(13, 1).tracedValueFor("that")).toBeDefined();
+        expect(result.scopeForPosition(13, 1).tracedValueFor("that")).toBe(result.scopeForPosition(9, 1).tracedValueFor("that"));
     });
 
     it("Can parse the exampe from the splice demo", function() {

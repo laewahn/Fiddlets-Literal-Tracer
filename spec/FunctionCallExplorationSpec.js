@@ -1,9 +1,13 @@
-var fc = require('../lib/FunctionCalling.js');
+/*global require, describe, it, expect */
+
+"use strict";
+
+var fc = require("../lib/FunctionCalling.js");
 
 describe("For a splice call on an array", function() {
 	it("should execute the method and return the return value", function() {
 		var functionChain = new fc.FunctionChain([
-			new fc.ObjectCall("", ['a', 'b', 'c']),
+			new fc.ObjectCall("", ["a", "b", "c"]),
 			new fc.FunctionCall("splice", [2])
 			]);
 
@@ -12,13 +16,13 @@ describe("For a splice call on an array", function() {
 			result = functionChain.executeUntil(1);
 		}).not.toThrow();
 
-		expect(result).toEqual(['c']);
-		expect(functionChain.calls[0].object).toEqual(['a', 'b']);
+		expect(result).toEqual(["c"]);
+		expect(functionChain.calls[0].object).toEqual(["a", "b"]);
 	});
 
 	it("should be able to only 'execute' the object and return its value", function() {
 		var functionChain = new fc.FunctionChain([
-			new fc.ObjectCall("", ['a', 'b', 'c']),
+			new fc.ObjectCall("", ["a", "b", "c"]),
 			new fc.FunctionCall("splice", [2])
 			]);
 
@@ -27,16 +31,16 @@ describe("For a splice call on an array", function() {
 			result = functionChain.executeUntil(0);
 		}).not.toThrow();
 
-		expect(result).toEqual(['a', 'b', 'c']);
+		expect(result).toEqual(["a", "b", "c"]);
 	});
 });
 
 describe("For a larger chained call on an array", function() {
 	it("should execute all methods and return the return value", function() {
 		var functionChain = new fc.FunctionChain([
-			new fc.ObjectCall("", ['a', 'b', 'c']),
+			new fc.ObjectCall("", ["a", "b", "c"]),
 			new fc.FunctionCall("splice", [2]),
-			new fc.FunctionCall("map",[function(e){return "_" + e + "_"}])
+			new fc.FunctionCall("map",[function(e){return "_" + e + "_";}])
 			]);
 
 		var result;
@@ -44,8 +48,8 @@ describe("For a larger chained call on an array", function() {
 			result = functionChain.executeUntil(2);
 		}).not.toThrow();
 
-		expect(result).toEqual(['_c_']);
-		expect(functionChain.calls[0].object).toEqual(['a', 'b']);
+		expect(result).toEqual(["_c_"]);
+		expect(functionChain.calls[0].object).toEqual(["a", "b"]);
 	});
 });
 
@@ -56,7 +60,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 		expect(function() {
 			// expected output: ['b', 'c']
 			var result = chain.executeUntil(1);
-			expect(result).toEqual(['b', 'c']);
+			expect(result).toEqual(["b", "c"]);
 		}).not.toThrow();
 
 		
@@ -64,7 +68,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 		expect(function() {
 			// expected output: ['c', 'b']
 			var result = chain.executeUntil(2);
-			expect(result).toEqual(['c', 'b']);
+			expect(result).toEqual(["c", "b"]);
 		}).not.toThrow();
 	});
 
@@ -77,10 +81,10 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 
 		expect(function() {
 			var chain = fc.functionChainFromLine("anArray.splice(1,2);\n", contextAssignments);
-			expect(chain.calls[0].object).toEqual(['a','b','c']);
+			expect(chain.calls[0].object).toEqual(["a","b","c"]);
 
 			var result = chain.executeUntil(1);
-			expect(result).toEqual(['b', 'c']);
+			expect(result).toEqual(["b", "c"]);
 		}).not.toThrow();
 	});
 
@@ -95,7 +99,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(chain.calls[1].args).toEqual([1,2]);
 
 			var result = chain.executeUntil(1);
-			expect(result).toEqual(['b', 'c']);
+			expect(result).toEqual(["b", "c"]);
 		}).not.toThrow();
 	});
 
@@ -110,7 +114,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(typeof(chain.calls[2].args[0])).toEqual("function");
 
 			var result = chain.executeUntil(2);
-			expect(result).toEqual(['bla_b', 'bla_c']);
+			expect(result).toEqual(["bla_b", "bla_c"]);
 		}).not.toThrow();
 	});
 
@@ -125,9 +129,9 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(chain.calls[2].unprocessedInput).not.toBeDefined();
 
 			var result = chain.executeUntil(3);
-			expect(chain.calls[2].unprocessedInput).toEqual(['b', 'c']);
-			expect(chain.calls[3].unprocessedInput).toEqual(['bla_b', 'bla_c']);
-			expect(result).toEqual(['bla_c', 'bla_b']);
+			expect(chain.calls[2].unprocessedInput).toEqual(["b", "c"]);
+			expect(chain.calls[3].unprocessedInput).toEqual(["bla_b", "bla_c"]);
+			expect(result).toEqual(["bla_c", "bla_b"]);
 		}).not.toThrow();
 	});
 });
