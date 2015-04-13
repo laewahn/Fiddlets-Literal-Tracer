@@ -3,6 +3,7 @@
 	
 	var LiteralTracer = require("./lib/LiteralTracer");
 	var LineParser = require("./lib/LineParser");
+	var fc = require("./lib/FunctionCalling");
 
 	var LITERAL_TRACER_DOMAIN = "literalTracerDomain";
 	var LITERAL_TRACER_VERSION = {major : 0, minor: 1};
@@ -43,6 +44,12 @@
 		if (assignment !== undefined) {
 			element.value = assignment;
 		}
+	}
+
+	function executeLineUntilCmd(line, idx) {
+		var chain = fc.functionChainFromLine(line);
+		var returnValue = chain.executeUntil(idx);
+		return { 'returnValue' : returnValue };
 	}
 
     function init(domainManager) {
@@ -88,7 +95,30 @@
 				type: "array",
 				description: "An array containing the functions of the given chain and the object on which they are called"
 			}]
-			)
+			);
+
+		domainManager.registerCommand(
+			LITERAL_TRACER_DOMAIN,
+			"executeLineUntil",
+			executeLineUntilCmd,
+			false,
+			"Executes the given line of code within the context of the previous tracing results",
+			[{
+				name: "line",
+				type: "string",
+				description: "The line of code that should be executed."
+			},
+			{
+				name: "idx",
+				type: "number",
+				description: "The index until which a chained function call should be executed."
+			}],
+			[{
+				name: "result",
+				type: "object",
+				description: "An object containing the return value of the function execution"
+			}]
+		);
 	}
 
 	exports.init = init;
