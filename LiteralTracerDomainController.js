@@ -18,33 +18,40 @@
 	};
 
 	exports.elementsForLineCmd = function(line) {
-		var lineElements = LineParser.parse(line);
 
+		function isIdentifier(e) {
+			return e.name !== undefined;
+		}
+
+		function hasParams(e) {
+			return e.params !== undefined;
+		}
+
+		function substituteIdentifiersWithAssignments(element) {
+			var assignment = lastTrace.allAssignments()[element.name];
+			if (typeof(assignment) === "function") {
+				assignment = "[Function] " + element.name;
+			}
+
+			if (assignment !== undefined) {
+				element.value = assignment;
+			}
+		}
+
+		var lineElements = LineParser.parse(line);
+		
 		lineElements.forEach(function(element){
-			if(lineElements !== undefined && element.name !== undefined) {
+			if(isIdentifier(element)) {
 				substituteIdentifiersWithAssignments(element);
 
-				if (element.params !== undefined) {
-					element.params.forEach(function(param) {
-						substituteIdentifiersWithAssignments(param);
-					});
+				if (hasParams(element)) {
+					element.params.forEach(substituteIdentifiersWithAssignments);
 				}
 			}
 		});
 
 		return lineElements;
 	};
-
-	function substituteIdentifiersWithAssignments(element) {
-		var assignment = lastTrace.allAssignments()[element.name];
-		if (typeof(assignment) === "function") {
-			assignment = "[Function] " + element.name;
-		}
-
-		if (assignment !== undefined) {
-			element.value = assignment;
-		}
-	}
 
 	exports.executeLineUntilCmd = function(line, executionIdx) {
 		var chain = fc.functionChainFromLine(line, lastTrace.allAssignments());
