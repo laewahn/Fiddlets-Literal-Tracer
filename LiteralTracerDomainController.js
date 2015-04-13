@@ -32,7 +32,7 @@
 		return lineElements;
 	}
 
-	exports.substituteIdentifiersWithAssignments  = function(element) {
+	function substituteIdentifiersWithAssignments(element) {
 		var assignment = lastTrace.allAssignments()[element.name];
 		if (typeof(assignment) === "function") {
 			assignment = "[Function] " + element.name;
