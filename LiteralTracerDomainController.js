@@ -28,7 +28,7 @@
 		}
 
 		function substituteIdentifiersWithAssignments(element) {
-			var assignment = lastTrace.allAssignments()[element.name];
+			var assignment = lastTrace.tracedValueFor(element.name);
 			if (typeof(assignment) === "function") {
 				assignment = "[Function] " + element.name;
 			}
@@ -39,7 +39,7 @@
 		}
 
 		var lineElements = LineParser.parse(line);
-		
+
 		lineElements.forEach(function(element){
 			if(isIdentifier(element)) {
 				substituteIdentifiersWithAssignments(element);
