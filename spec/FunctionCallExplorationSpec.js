@@ -135,3 +135,23 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 		}).not.toThrow();
 	});
 });
+
+describe("For functions declared inside the scope", function() {
+
+	it("should make those executable", function() {
+		var LiteralTracer = require("../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "var someString = 'bla';\nfunction addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as\n}\n";
+		var line = "addAwesomeness(someString).indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+ 			var chain = fc.functionChainFromLine(line, contextAssignments);
+ 			var result = chain.executeUntil(1);
+ 			
+ 			expect(result).toEqual(11);
+		}).not.toThrow();
+	});
+});

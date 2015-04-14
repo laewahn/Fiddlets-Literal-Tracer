@@ -1,6 +1,6 @@
 {
     "name" : "LiteralTracer",
-    "version" : "0.0.47",
+    "version" : "0.0.48",
     "description" : "Traces literal assignments throughout the code, using static analysis",
     "author" : "Dennis Lewandowski",
     "engine" : "node >= 0.10.x",
