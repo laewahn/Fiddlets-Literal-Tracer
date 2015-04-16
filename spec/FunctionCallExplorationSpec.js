@@ -154,4 +154,21 @@ describe("For functions declared inside the scope", function() {
  			expect(result).toEqual(11);
 		}).not.toThrow();
 	});
+
+	it("should make those executable also on literals", function() {
+		var LiteralTracer = require("../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as\n}\n";
+		var line = "addAwesomeness('bla').indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+ 			var chain = fc.functionChainFromLine(line, contextAssignments);
+ 			var result = chain.executeUntil(1);
+ 			
+ 			expect(result).toEqual(11);
+		}).not.toThrow();
+	});
 });
