@@ -61,7 +61,8 @@
 		chain.calls.slice(0, executionIdx + 1).forEach(function(e, idx) {
 			executionResult.push({ 
 				returnValue : (idx >= executionIdx) ? returnValue : chain.calls[idx + 1].unprocessedInput,
-				input : e.unprocessedInput 
+				input : e.unprocessedInput,
+				originalValue: chain.calls[0].object
 			});
 		});
 

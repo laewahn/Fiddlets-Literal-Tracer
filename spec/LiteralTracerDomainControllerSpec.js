@@ -76,3 +76,21 @@ describe("When not completely executing a line", function(){
 		expect(result[2].returnValue).toEqual(["bla_b","bla_c"]);
 	});
 });
+
+describe("When executing any line", function() {
+	it("should return the state of the original object", function() {
+		var contextCode = "var anArray = ['a','b','c'];\n var index = 1;\nvar count = 2;\n function appendBla(v) { return \"bla_\" + v };\n";
+		var line = "anArray.splice(index,count).map(appendBla).reverse();\n";		
+
+		domainController.traceCmd(contextCode + line, {line: 0, ch: 1});
+
+		var result = domainController.executeLineUntilCmd(line, 0);
+		expect(result[0].originalValue).toEqual(['a','b','c']);
+
+		result = domainController.executeLineUntilCmd(line, 1);
+		expect(result[0].originalValue).toEqual(['a']);
+
+		result = domainController.executeLineUntilCmd(line, 3);
+		expect(result[0].originalValue).toEqual(['a']);
+	});
+});
