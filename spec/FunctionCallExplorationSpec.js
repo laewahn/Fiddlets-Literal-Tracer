@@ -159,7 +159,7 @@ describe("For functions declared inside the scope", function() {
 		var LiteralTracer = require("../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
-		var contextCode = "function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as\n}\n";
+		var contextCode = "function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n";
 		var line = "addAwesomeness('bla').indexOf('a');\n";
 
 		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
@@ -170,5 +170,63 @@ describe("For functions declared inside the scope", function() {
  			
  			expect(result).toEqual(11);
 		}).not.toThrow();
+	});
+
+	it("should make those executable on the result of a function executed as a parameter", function() {
+		var LiteralTracer = require("../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = 	"function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n" +
+							"function addDashes(s) {\nreturn '---'+s+'---';\n}\n";
+		var line = "addDashes(addAwesomeness('bla')).indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+ 			var chain = fc.functionChainFromLine(line, contextAssignments);
+ 			var result = chain.executeUntil(1);
+ 			
+ 			expect(result).toEqual(14);
+		}).not.toThrow();
+	});
+
+	it("should make those executable also on the result of some nested functions executed as a parameters", function() {
+		var LiteralTracer = require("../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = 	"function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n" +
+							"function addDashes(s) {\nreturn '---'+s+'---';\n}\n" +
+							"function addMarks(s) {\nreturn '!!' + s + '!!'\n}\n";
+		var line = "addMarks(addDashes(addAwesomeness('bla'))).indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+ 			var chain = fc.functionChainFromLine(line, contextAssignments);
+ 			var result = chain.executeUntil(1);
+ 			
+ 			expect(result).toEqual(16);
+ 			expect(chain.executeUntil(0)).toEqual("!!--- AWESOME bla AWESOME ---!!");
+		}).not.toThrow();
+	});
+});
+
+describe("For computed assignments", function() {
+	it("should ignore the assignment and just compute the righthand expression", function() {
+		var LiteralTracer = require("../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "var bla = 'bla'\n";
+		var line = "var anIndex = bla.indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+ 			var chain = fc.functionChainFromLine(line, contextAssignments);
+ 			var result = chain.executeUntil(1);
+ 			
+ 			expect(result).toEqual(2);
+		}).not.toThrow();
+	
 	});
 });

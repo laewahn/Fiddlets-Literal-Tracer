@@ -77,7 +77,7 @@ describe("For functions called on some variable", function(){
 	it("should return the values of the params for each function call", function() {
 		var source = "anArray.slice(1,2).map(addOne);\n";
 		var result = LineParser.parse(source);
-
+		
 		expect(result[0].params).toEqual([]);
 		expect(result[1].params[0].value).toEqual(1);
 		expect(result[1].params[1].value).toEqual(2);
@@ -133,4 +133,28 @@ describe("For functions called on some literal", function() {
 		expect(result[0].value).toEqual("foobar");
 		expect(result[1].name).toEqual("indexOf");
 	});	
+});
+
+describe("For functions with functions as arguments", function() {
+	it("should include these in the parameters", function() {
+		var source = "addDashes(addAwesomeness('bla')).indexOf('a');\n";
+		var result = LineParser.parse(source);
+
+		expect(result.length).toEqual(2);
+		expect(result[0].name).toEqual("addDashes");
+
+		expect(result[0].params[0].name).toBeDefined();
+		expect(result[0].params[0].name).toEqual("addAwesomeness");
+	});
+});
+
+describe("For assignments with a function chain on the right hand side", function() {
+	it("should ignore the assignment and just split the right hand function chain", function() {
+		var source = "var anIndex = bla.indexOf('a');\n";
+		var result = LineParser.parse(source);
+
+		expect(result.length).toEqual(2);
+		expect(result[0].name).toEqual('bla');
+		expect(result[1].name).toEqual('indexOf');
+	});
 });
