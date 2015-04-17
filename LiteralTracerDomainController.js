@@ -62,7 +62,7 @@
 			executionResult.push({ 
 				returnValue : (idx >= executionIdx) ? returnValue : chain.calls[idx + 1].unprocessedInput,
 				input : e.unprocessedInput,
-				original: { value : chain.calls[0].object,
+				original: { value : chain.calls[idx].original,
 							name: chain.calls[0].name || "[anonymous]"
 						}
 			});

@@ -88,13 +88,12 @@ describe("When executing any line", function() {
 		expect(result[0].original.value).toEqual(["a","b","c"]);
 		expect(result[0].original.name).toEqual("anArray");
 
-		result = domainController.executeLineUntilCmd(line, 1);
-		expect(result[0].original.value).toEqual(["a"]);
+		var result = domainController.executeLineUntilCmd(line, 3);
 		expect(result[0].original.name).toEqual("anArray");
-
-		result = domainController.executeLineUntilCmd(line, 3);
-		expect(result[0].original.value).toEqual(["a"]);
-		expect(result[0].original.name).toEqual("anArray");
+		expect(result[0].original.value).toEqual(["a","b","c"]);
+		expect(result[1].original.value).toEqual(["a"]);
+		expect(result[2].original.value).toEqual(["a"]);
+		expect(result[3].original.value).toEqual(["a"]);
 	});
 
 	it("should keep the value of the anonymously initialized object", function() {
@@ -103,16 +102,11 @@ describe("When executing any line", function() {
 
 		domainController.traceCmd(contextCode + line, {line: 0, ch: 1});
 
-		var result = domainController.executeLineUntilCmd(line, 0);
+		var result = domainController.executeLineUntilCmd(line, 3);
+		expect(result[0].original.name).toEqual("[anonymous]");
 		expect(result[0].original.value).toEqual(["a","b","c"]);
-		expect(result[0].original.name).toEqual("[anonymous]");
-
-		result = domainController.executeLineUntilCmd(line, 1);
-		expect(result[0].original.value).toEqual(["a"]);
-		expect(result[0].original.name).toEqual("[anonymous]");
-
-		result = domainController.executeLineUntilCmd(line, 3);
-		expect(result[0].original.value).toEqual(["a"]);
-		expect(result[0].original.name).toEqual("[anonymous]");
+		expect(result[1].original.value).toEqual(["a"]);
+		expect(result[2].original.value).toEqual(["a"]);
+		expect(result[3].original.value).toEqual(["a"]);
 	});	
 });
