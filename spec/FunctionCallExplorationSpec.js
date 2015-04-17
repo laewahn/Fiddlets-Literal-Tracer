@@ -207,6 +207,8 @@ describe("For functions declared inside the scope", function() {
  			
  			expect(result).toEqual(16);
  			expect(chain.executeUntil(0)).toEqual("!!--- AWESOME bla AWESOME ---!!");
+ 			expect(chain.calls[0].name).not.toEqual("addMarks");
+ 			expect(chain.calls[0].name).toEqual("[anonymous]");
 		}).not.toThrow();
 	});
 });
