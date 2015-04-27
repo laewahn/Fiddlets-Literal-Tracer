@@ -134,6 +134,25 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 			expect(result).toEqual(["bla_c", "bla_b"]);
 		}).not.toThrow();
 	});
+
+	it("should be able to use the empty string literal in the parameters", function() {
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = "var str = 'bla';\n";
+		var line = "var chars = str.split('');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();
+
+		expect(function() {
+			var chain = fc.functionChainFromLine(line, contextAssignments);
+			
+			expect(chain.calls[1].args).toBeDefined();
+			expect(chain.calls[1].args[0]).toEqual("");
+			
+			var result = chain.executeUntil(1);
+			expect(result).toEqual(['b', 'l', 'a']);
+		}).not.toThrow();
+	});
 });
 
 describe("For functions declared inside the scope", function() {
