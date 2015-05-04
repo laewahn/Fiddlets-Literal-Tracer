@@ -2,7 +2,7 @@
 
 "use strict";
 
-var fc = require("../lib/FunctionCalling.js");
+var fc = require("../../lib/FunctionCalling.js");
 
 describe("For a splice call on an array", function() {
 	it("should execute the method and return the return value", function() {
@@ -72,7 +72,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 		}).not.toThrow();
 	});
 
-	var LiteralTracer = require("../lib/LiteralTracer");
+	var LiteralTracer = require("../../lib/LiteralTracer");
 	it("should substitute a missing value for the first element with the value from a given static trace", function() {
 		var tracer = new LiteralTracer.Tracer();
 
@@ -158,7 +158,7 @@ describe("Given an algorithm to build a function chain from a line of code", fun
 describe("For functions declared inside the scope", function() {
 
 	it("should make those executable", function() {
-		var LiteralTracer = require("../lib/LiteralTracer");
+		var LiteralTracer = require("../../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
 		var contextCode = "var someString = 'bla';\nfunction addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as\n}\n";
@@ -175,7 +175,7 @@ describe("For functions declared inside the scope", function() {
 	});
 
 	it("should make those executable also on literals", function() {
-		var LiteralTracer = require("../lib/LiteralTracer");
+		var LiteralTracer = require("../../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
 		var contextCode = "function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n";
@@ -192,7 +192,7 @@ describe("For functions declared inside the scope", function() {
 	});
 
 	it("should make those executable on the result of a function executed as a parameter", function() {
-		var LiteralTracer = require("../lib/LiteralTracer");
+		var LiteralTracer = require("../../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
 		var contextCode = 	"function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n" +
@@ -210,7 +210,7 @@ describe("For functions declared inside the scope", function() {
 	});
 
 	it("should make those executable also on the result of some nested functions executed as a parameters", function() {
-		var LiteralTracer = require("../lib/LiteralTracer");
+		var LiteralTracer = require("../../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
 		var contextCode = 	"function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n" +
@@ -234,7 +234,7 @@ describe("For functions declared inside the scope", function() {
 
 describe("For computed assignments", function() {
 	it("should ignore the assignment and just compute the righthand expression", function() {
-		var LiteralTracer = require("../lib/LiteralTracer");
+		var LiteralTracer = require("../../lib/LiteralTracer");
 		var tracer = new LiteralTracer.Tracer();
 
 		var contextCode = "var bla = 'bla'\n";

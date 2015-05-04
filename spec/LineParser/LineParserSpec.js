@@ -2,7 +2,7 @@
 
 "use strict";
 
-var LineParser = require("../lib/LineParser");
+var LineParser = require("../../lib/LineParser");
 
 describe("For functions called on some variable", function(){
 	it("should return an array with the name of the variable and the name of the function for one function", function() {

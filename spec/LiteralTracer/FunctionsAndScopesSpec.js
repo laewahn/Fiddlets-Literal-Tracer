@@ -2,7 +2,7 @@
 
 "use strict";
 
-var LiteralTracer = require("../lib/LiteralTracer.js");
+var LiteralTracer = require("../../lib/LiteralTracer.js");
 var testTracer = new LiteralTracer.Tracer();
 
 describe("For global scope", function() {

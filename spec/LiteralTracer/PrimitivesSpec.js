@@ -2,7 +2,7 @@
 
 "use strict";
 
-var LiteralTracer = require("../lib/LiteralTracer.js");
+var LiteralTracer = require("../../lib/LiteralTracer.js");
 var testTracer = new LiteralTracer.Tracer();
 
 describe("when there is a mathematical computation that does not use any functions", function() {
