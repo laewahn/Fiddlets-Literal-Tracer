@@ -19,13 +19,12 @@ var testSource = 	"var y = \/*\"x\"*\/ \"xxxxxxxy\";\r\n" +
 					"\treturn \"foo_\" + value\r\n" + 
 					"};";
 
-describe("testSource", function(){
+xdescribe("testSource", function(){
 	it("should produce output when being parsed", function() {
 		var tr = require("../lib/LiteralTracer");
 		var tracer = new tr.Tracer();
 		expect(tracer).toBeDefined();
 		console.log(tracer.trace(testSource));
-		console.log(tracer.trace(testSource).results.__location.start);
 	});
 });
 
@@ -35,13 +34,12 @@ describe("LiteralTracer", function() {
 		var tracer = new tr.Tracer();
 		
 		var result = tracer.trace(testSource);
-		
-		expect(result.contextFor("index")).toEqual([
-			{start: {line : 5}}
-		]);
+		expect(result.contextFor("index")[0].start.line).toEqual(5);
+		expect(result.contextFor("howMany")[0].start.line).toEqual(6);
 
-		expect(result.contextFor("howMany")).toEqual([
-			{start: {line : 6}}
-		]);
+		expect(result.contextFor("anArray").length).toEqual(2);
+		expect(result.contextFor("anArray")[0].start.line).toEqual(7);
+		expect(result.contextFor("anArray")[1]).toBeDefined();
+		expect(result.contextFor("anArray")[1].start.line).toEqual(8);
 	});
 });
