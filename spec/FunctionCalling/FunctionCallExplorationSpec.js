@@ -230,6 +230,25 @@ describe("For functions declared inside the scope", function() {
  			expect(chain.calls[0].name).toEqual("[anonymous]");
 		}).not.toThrow();
 	});
+
+	it("should execute literal operations in parameters", function() {
+		var LiteralTracer = require("../../lib/LiteralTracer");
+		var tracer = new LiteralTracer.Tracer();
+
+		var contextCode = 	"function addAwesomeness(s) {\nvar as = ' AWESOME ';\nreturn as + s + as;\n}\n" +
+							"function addDashes(s) {\nreturn '---'+s+'---';\n}\n" +
+							"function addMarks(s) {\nreturn '!!' + s + '!!'\n}\n";
+		var line = "addMarks(addDashes(addAwesomeness('b' + 'la'))).indexOf('a');\n";
+
+		var contextAssignments = tracer.trace(contextCode + line).allAssignments();		
+
+		expect(function() {
+			var chain = fc.functionChainFromLine(line, contextAssignments);
+			var result = chain.executeUntil(0);
+
+			expect(result).toEqual("!!--- AWESOME bla AWESOME ---!!");
+		}).not.toThrow();
+	});
 });
 
 describe("For computed assignments", function() {
