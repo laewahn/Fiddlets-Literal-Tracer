@@ -22,6 +22,37 @@ describe("When parsing a line", function() {
 		expect(result[1].params[0].value).toEqual(1);
 		expect(result[1].params[1].value).toEqual(2);
 	});
+
+	it("should work for the real live example", function() {
+		var testSource = 	"var y = \/*\"x\"*\/ \"xxxxxxxy\";\r\n" +
+					"y;\r\n" + 
+					"var bla = \"blu\" + \"bla\";\r\n" + 
+					"var someValue = bla.indexOf(\'l\');\r\n" + 
+					"var index = 2;\r\n" + 
+					"var howMany = 1;\r\n" + 
+					"var anArray = [\"a\", \"b\", \"c\", \"b\"];\r\n" + 
+					"anArray.push(\"d\");\r\n" + 
+					"var bbla = \"b_bla\";\r\n" + 
+					"var newArry = anArray.slice(0,index).map(appendBla);\r\n" + 
+					"[\"a\",\"b\",\"c\"].splice(2,3, \"x\").map(appendBla).reverse().indexOf(bbla);\r\n" + 
+					"var x = appendBla(prependFoo(bla)).indexOf(\'blax\');\r\n" +
+					"bla.indexOf(\'a\');\r\n" + 
+					"[bla, bla].slice(1,2).map(uppercase);\r\n" +
+					"var appendBla = function(entry) {\r\n" + 
+					"\/\/\ty;\r\n" +
+					"\treturn entry + \"_bla\"\r\n" + 
+					"}\r\n" + 
+					"\r\n" + 
+					"function prependFoo(value) {\r\n" + 
+					"\treturn \"foo_\" + value\r\n" + 
+					"};" + 
+					"function uppercase(string) {\r\n" + 
+					"    return string.toUpperCase();\r\n" + 
+					"};\r\n";
+
+		domainController.traceCmd(testSource, {line: 0, ch: 1});
+
+	});
 });
 
 describe("When not completely executing a line", function(){

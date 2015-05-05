@@ -16,6 +16,7 @@ var testSource = 	"var y = \/*\"x\"*\/ \"xxxxxxxy\";\r\n" +
 					"[\"a\",\"b\",\"c\"].splice(2,3, \"x\").map(appendBla).reverse().indexOf(bbla);\r\n" + 
 					"var x = appendBla(prependFoo(bla)).indexOf(\'blax\');\r\n" +
 					"bla.indexOf(\'a\');\r\n" + 
+					"[bla, bla].slice(1,2).map(uppercase);\r\n" +
 					"var appendBla = function(entry) {\r\n" + 
 					"\/\/\ty;\r\n" +
 					"\treturn entry + \"_bla\"\r\n" + 
