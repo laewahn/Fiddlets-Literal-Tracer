@@ -76,6 +76,24 @@
 				description: "An array containing the return values of the elements of the function execution"
 			}]
 		);
+
+		domainManager.registerCommand(
+			LITERAL_TRACER_DOMAIN,
+			"contextForLine",
+			LiteralTracerDomainController.contextForLineCmd,
+			false,
+			"Returns a map with the locations of parts of the code that are relevant for this line",
+			[{
+				name: "line",
+				type: "string",
+				description: "The current line of code"
+			}],
+			[{
+				name: "context",
+				type: "object",
+				description: "A map which indexes positions in the source code by identifier name"
+			}]
+		);
 	}
 
 	exports.init = init;
