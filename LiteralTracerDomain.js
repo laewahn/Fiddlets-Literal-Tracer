@@ -94,6 +94,28 @@
 				description: "A map which indexes positions in the source code by identifier name"
 			}]
 		);
+
+		domainManager.registerCommand(
+			LITERAL_TRACER_DOMAIN,
+			"contextForPositionInSource",
+			LiteralTracerDomainController.contextForPositionInSourceCmd,
+			false,
+			"Returns a map with the locations of parts of the code relevant for the line given in the position parameter",
+			[{
+				name: "position",
+				type: "object",
+				description: "The position for which the context should be returned"
+			},
+			{
+				name: "source",
+				type: "string",
+				description: "The source code"	
+			}],
+			[{
+				name: "context",
+				type: "object",
+				description: "The context for the position"
+			}]);
 	}
 
 	exports.init = init;

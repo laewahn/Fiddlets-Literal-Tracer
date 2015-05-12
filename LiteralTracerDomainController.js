@@ -96,7 +96,7 @@
 		return _.reduce(parsedLine, collectIdentifiers, {});
 	};
 
-	exports.contextForPositionInSource = function(position, source) {
+	exports.contextForPositionInSourceCmd = function(position, source) {
 		var lines = source.split("\n");
 		var theLine = lines[position.line - 1];
 
