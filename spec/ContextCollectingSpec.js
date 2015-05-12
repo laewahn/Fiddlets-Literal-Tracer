@@ -74,4 +74,20 @@ describe("The domain controller", function() {
 		var result = controller.contextForLineCmd(line);
 		expect(Object.keys(result)).toEqual(["bla", "prependFoo", "appendBla"]);
 	});
+
+	it("should have a command to get the context for a line in some source", function() {
+		var controller = require("../LiteralTracerDomainController");
+
+		var result = controller.contextForPositionInSource({line: 10, ch: 1}, testSource);
+		expect(Object.keys(result)).toEqual(["anArray", "index" ,"appendBla"]);
+	});
+
+	it("should only return operations on objects used that occur before the selected line", function() {
+		var controller = require("../LiteralTracerDomainController");
+
+		var result = controller.contextForPositionInSource({line: 12, ch: 1}, testSource);
+		expect(Object.keys(result)).toEqual(["bla", "prependFoo" ,"appendBla"]);
+		expect(result["bla"].length).toEqual(1);
+		expect(result["prependFoo"]).toBeDefined();
+	});
 });

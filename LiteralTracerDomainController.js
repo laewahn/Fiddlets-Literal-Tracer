@@ -96,4 +96,19 @@
 		return _.reduce(parsedLine, collectIdentifiers, {});
 	};
 
+	exports.contextForPositionInSource = function(position, source) {
+		var lines = source.split("\n");
+		var theLine = lines[position.line - 1];
+
+		var trace = exports.traceCmd(source, position);
+		var context = exports.contextForLineCmd(theLine);
+		Object.keys(context).forEach(function(k) {
+			_.remove(context[k], function(e) {
+				return typeof(e) !== "function" && e.start.line > position.line;
+			});
+		});
+
+		return context;
+	}
+
 }());
