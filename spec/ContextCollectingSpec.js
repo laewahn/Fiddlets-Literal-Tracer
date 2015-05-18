@@ -87,7 +87,8 @@ describe("The domain controller", function() {
 
 		var result = controller.contextForPositionInSourceCmd({line: 12, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["bla", "prependFoo" ,"appendBla"]);
-		expect(result["bla"].length).toEqual(1);
-		expect(result["prependFoo"]).toBeDefined();
+		expect(result.bla.length).toEqual(1);
+		expect(result.prependFoo).toBeDefined();
+		expect(result.prependFoo.length).toBe(1);
 	});
 });
