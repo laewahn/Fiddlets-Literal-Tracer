@@ -104,7 +104,7 @@
 		var context = exports.contextForLineCmd(theLine);
 		Object.keys(context).forEach(function(k) {
 			_.remove(context[k], function(e) {
-				return typeof(trace[k]) !== "function" && e.start.line > position.line;
+				return typeof(trace[k]) !== "function" && e.start.line > position.line - 1;
 			});
 		});
 

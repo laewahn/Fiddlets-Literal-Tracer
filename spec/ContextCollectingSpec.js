@@ -91,4 +91,13 @@ describe("The domain controller", function() {
 		expect(result.prependFoo).toBeDefined();
 		expect(result.prependFoo.length).toBe(1);
 	});
+
+	it("should not include the current line", function() {
+		var controller = require("../LiteralTracerDomainController");
+
+		var result = controller.contextForPositionInSourceCmd({line: 13, ch: 1}, testSource);
+		
+		expect(result.bla.length).toEqual(1);
+		expect(result.bla[0].start.line).toEqual(3);
+	});
 });
