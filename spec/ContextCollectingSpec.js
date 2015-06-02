@@ -52,13 +52,14 @@ describe("LiteralTracer", function() {
 });
 
 describe("The domain controller", function() {
+
+	var controller = require("../LiteralTracerDomainController");
+
 	it("should have a command to get the context for a line", function() {
-		var controller = require("../LiteralTracerDomainController");
 		expect(controller.contextForLineCmd).toBeDefined();
 	});
 
 	it("should return a context map for every variable used in the line", function() {
-		var controller = require("../LiteralTracerDomainController");
 		controller.traceCmd(testSource, {line: 1, ch: 1});
 
 		var line = "var newArry = anArray.slice(0,index).map(appendBla);\r\n";
@@ -67,7 +68,6 @@ describe("The domain controller", function() {
 	});
 
 	it("should return a context map for locally available functions used in the line", function() {
-		var controller = require("../LiteralTracerDomainController");
 		controller.traceCmd(testSource, {line: 1, ch: 1});
 
 		var line = "var x = appendBla(prependFoo(bla)).indexOf(\'blax\');\r\n";
@@ -76,15 +76,11 @@ describe("The domain controller", function() {
 	});
 
 	it("should have a command to get the context for a line in some source", function() {
-		var controller = require("../LiteralTracerDomainController");
-
 		var result = controller.contextForPositionInSourceCmd({line: 10, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["anArray", "index" ,"appendBla"]);
 	});
 
 	it("should only return operations on objects used that occur before the selected line", function() {
-		var controller = require("../LiteralTracerDomainController");
-
 		var result = controller.contextForPositionInSourceCmd({line: 12, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["bla", "prependFoo" ,"appendBla"]);
 		expect(result.bla.length).toEqual(1);
@@ -93,8 +89,6 @@ describe("The domain controller", function() {
 	});
 
 	it("should not include the current line", function() {
-		var controller = require("../LiteralTracerDomainController");
-
 		var result = controller.contextForPositionInSourceCmd({line: 13, ch: 1}, testSource);
 		
 		expect(result.bla.length).toEqual(1);
