@@ -122,7 +122,7 @@
 			if(contextFromTrace !== undefined && collector[idFromLine] === undefined) {
 				
 				collector[idFromLine] = contextFromLine[idFromLine];
-				if( typeof(trace.results[idFromLine]) !== "function") {
+				if(typeof(trace.results[idFromLine]) !== "function") {
 					
 					contextFromTrace.forEach(function(nextPosition){
 						var nextLine = nextPosition.start.line - 1;
