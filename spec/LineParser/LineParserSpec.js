@@ -84,6 +84,13 @@ describe("For functions called on some variable", function(){
 		expect(result[2].params[0].name).toEqual("addOne");
 	});
 
+	it("should return the identifiert for each parameter", function() {
+		var source = "bar.push(baz);\n";
+		var result = LineParser.parse(source);
+
+		expect(result[1].params[0].name).toEqual("baz");
+	});
+
 	it("should return the position of the params for each function call", function() {
 		var source = "anArray.slice(1,2).map(addOne);\n";
 		var result = LineParser.parse(source);
@@ -156,5 +163,15 @@ describe("For assignments with a function chain on the right hand side", functio
 		expect(result.length).toEqual(2);
 		expect(result[0].name).toEqual('bla');
 		expect(result[1].name).toEqual('indexOf');
+	});
+});
+
+describe("For assignments with no function chain on the right hand side", function() {
+	it("return the right hand side", function() {
+		var source = "bar = foo\n";
+		var result = LineParser.parse(source);
+
+		expect(result.length).toEqual(1);
+		expect(result[0].name).toEqual('foo');
 	});
 });

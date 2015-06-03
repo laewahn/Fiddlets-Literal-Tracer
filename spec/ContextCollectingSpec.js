@@ -112,7 +112,7 @@ describe("The domain controller", function() {
 					 "var baz = [];\n" +
 					 "bar.push(baz);\n" +
 					 "baz.push(lines);\n" +
-					 "bar = baz;\n" +
+					 "baz.push(bar);\n" +
 					 "lines = bar;\n";
 
         var result = controller.contextForPositionInSourceCmd({line: 6, ch: 1}, testSource);
@@ -120,5 +120,8 @@ describe("The domain controller", function() {
 
         result = controller.contextForPositionInSourceCmd({line: 7, ch: 1}, testSource);
         expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV"]);
+
+        var result = controller.contextForPositionInSourceCmd({line: 8, ch: 1}, testSource);
+        expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV", "bar"]);
 	});
 });

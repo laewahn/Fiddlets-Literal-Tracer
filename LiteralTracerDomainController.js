@@ -110,20 +110,29 @@
 		});
 
 		var nestedContexts = {};
-		Object.keys(context).forEach(function(k){
-			if(lastTrace.contextFor(k) !== undefined) {
-				nestedContexts[k] = context[k];
-
-				if (typeof(trace[k]) !== "function") {
-					var moreContext = exports.contextForLineCmd(lines[lastTrace.contextFor(k)[0].start.line - 1]);
-					Object.keys(moreContext).forEach(function(moreKey) {
-						nestedContexts[moreKey] = moreContext[moreKey];
-					});
-				};
-			}
-		});
+		collectContextForLine(theLine, lines, lastTrace, nestedContexts);
 
 		return nestedContexts;
 	};
+
+	function collectContextForLine(line, allLines, trace, collector) {
+		var contextFromLine = exports.contextForLineCmd(line);
+		Object.keys(contextFromLine).forEach(function(idFromLine) {
+			if(trace.contextFor(idFromLine) !== undefined) {
+				if(collector[idFromLine] !== undefined) {
+					return;
+				}
+
+				collector[idFromLine] = contextFromLine[idFromLine];
+				if( typeof(trace.results[idFromLine]) !== "function") {
+					var contextFromTrace = trace.contextFor(idFromLine);
+					contextFromTrace.forEach(function(nextPosition){
+						var nextLine = nextPosition.start.line - 1;
+						collectContextForLine(allLines[nextLine], allLines, trace, collector);
+					});
+				}
+			}
+		});
+	}
 
 }());
