@@ -102,13 +102,28 @@
 
 		var trace = exports.traceCmd(source, position);
 		var context = exports.contextForLineCmd(theLine);
+
 		Object.keys(context).forEach(function(k) {
 			_.remove(context[k], function(e) {
 				return typeof(trace[k]) !== "function" && e.start.line > position.line - 1;
 			});
 		});
 
-		return context;
+		var nestedContexts = {};
+		Object.keys(context).forEach(function(k){
+			if(lastTrace.contextFor(k) !== undefined) {
+				nestedContexts[k] = context[k];
+
+				if (typeof(trace[k]) !== "function") {
+					var moreContext = exports.contextForLineCmd(lines[lastTrace.contextFor(k)[0].start.line - 1]);
+					Object.keys(moreContext).forEach(function(moreKey) {
+						nestedContexts[moreKey] = moreContext[moreKey];
+					});
+				};
+			}
+		});
+
+		return nestedContexts;
 	};
 
 }());

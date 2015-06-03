@@ -94,4 +94,31 @@ describe("The domain controller", function() {
 		expect(result.bla.length).toEqual(1);
 		expect(result.bla[0].start.line).toEqual(3);
 	});
+
+	it("should include the context of the lines referenced by the context", function() {
+		testSource = "var moviesAndPricesCSV = \"name\\tprice\\nCasablanca\\t10\\nCitizen Cane\\t7\\nNosferatu\\t5\";\n" +
+					 "var lines = moviesAndPricesCSV.split(\"\\n\");\n" +
+					 "var withoutHeader = lines.slice(1);\n";
+
+        var result = controller.contextForPositionInSourceCmd({line: 3, ch: 1}, testSource);
+        expect(Object.keys(result)).toEqual(["lines", "moviesAndPricesCSV"]);
+	});
+
+	it("should include the context of the lines referenced by the context in a more elaborated example", function() {
+		testSource = "var moviesAndPricesCSV = \"name\\tprice\\nCasablanca\\t10\\nCitizen Cane\\t7\\nNosferatu\\t5\";\n" +
+					 "var lines = moviesAndPricesCSV.split(\"\\n\");\n" +
+					 "var withoutHeader = lines.slice(1);\n" +
+					 "var bar = [];\n" + 
+					 "var baz = [];\n" +
+					 "bar.push(baz);\n" +
+					 "baz.push(lines);\n" +
+					 "bar = baz;\n" +
+					 "lines = bar;\n";
+
+        var result = controller.contextForPositionInSourceCmd({line: 6, ch: 1}, testSource);
+        expect(Object.keys(result)).toEqual(["bar", "baz"]);
+
+        result = controller.contextForPositionInSourceCmd({line: 7, ch: 1}, testSource);
+        expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV"]);
+	});
 });
