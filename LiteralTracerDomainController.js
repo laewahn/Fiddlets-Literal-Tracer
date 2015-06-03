@@ -118,14 +118,12 @@
 	function collectContextForLine(line, allLines, trace, collector) {
 		var contextFromLine = exports.contextForLineCmd(line);
 		Object.keys(contextFromLine).forEach(function(idFromLine) {
-			if(trace.contextFor(idFromLine) !== undefined) {
-				if(collector[idFromLine] !== undefined) {
-					return;
-				}
-
+			var contextFromTrace = trace.contextFor(idFromLine);
+			if(contextFromTrace !== undefined && collector[idFromLine] === undefined) {
+				
 				collector[idFromLine] = contextFromLine[idFromLine];
 				if( typeof(trace.results[idFromLine]) !== "function") {
-					var contextFromTrace = trace.contextFor(idFromLine);
+					
 					contextFromTrace.forEach(function(nextPosition){
 						var nextLine = nextPosition.start.line - 1;
 						collectContextForLine(allLines[nextLine], allLines, trace, collector);
