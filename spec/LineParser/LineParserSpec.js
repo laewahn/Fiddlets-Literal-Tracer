@@ -115,7 +115,7 @@ describe("For functions called on some variable", function(){
 	});
 });
 
-describe("For functions called on some literal", function() {
+xdescribe("For functions called on some literal", function() {
 	it("should return an array with the initialized array and the name of the function for one function", function() {
 		var source = "['a','b','c'].slice(1,2);\n";
 		var result = LineParser.parse(source);
