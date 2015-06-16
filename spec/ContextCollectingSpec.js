@@ -121,7 +121,18 @@ describe("The domain controller", function() {
         result = controller.contextForPositionInSourceCmd({line: 7, ch: 1}, testSource);
         expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV"]);
 
-        var result = controller.contextForPositionInSourceCmd({line: 8, ch: 1}, testSource);
+        result = controller.contextForPositionInSourceCmd({line: 8, ch: 1}, testSource);
         expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV", "bar"]);
+	});
+
+	it("should be able to handle multiline commands", function() {
+		testSource = "var moviesAndPricesCSV = \"name\\tprice\"+\n" +
+					 "\"Casablanca\\t10\" + \n" +
+					 "\"Citizen Cane\\t7\" + \n" +
+					 "\"Nosferatu\\t5\";\n" +
+					 "var lines = moviesAndPricesCSV.split(\"\\n\");\n";
+
+		var result = controller.contextForPositionInSourceCmd({line: 5, ch: 1}, testSource);
+        expect(Object.keys(result)).toEqual(["moviesAndPricesCSV"]);
 	});
 });

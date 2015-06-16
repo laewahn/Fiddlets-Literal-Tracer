@@ -96,11 +96,21 @@
 		return _.reduce(parsedLine, collectIdentifiers, {});
 	};
 
+	var esprima = require("esprima");
+
 	exports.contextForPositionInSourceCmd = function(position, source) {
 		var lines = source.split("\n");
 		var theLine = lines[position.line - 1];
-
+		
 		var trace = exports.traceCmd(source, position);
+		var commands = esprima.parse(source, {range: true}).body;
+		
+		var commandSources = [];
+		commands.forEach(function(e){
+			var commandSource = source.substring(e.range[0], e.range[1]);
+			commandSources.push(commandSource);
+		});
+
 		var context = exports.contextForLineCmd(theLine);
 
 		Object.keys(context).forEach(function(k) {
@@ -110,7 +120,7 @@
 		});
 
 		var nestedContexts = {};
-		collectContextForLine(theLine, lines, lastTrace, nestedContexts);
+		collectContextForLine(theLine, commandSources, lastTrace, nestedContexts);
 
 		return nestedContexts;
 	};
