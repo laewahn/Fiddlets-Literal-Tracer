@@ -136,7 +136,7 @@ describe("The domain controller", function() {
         expect(Object.keys(result)).toEqual(["moviesAndPricesCSV"]);
 	});
 
-	it("should work with my example...", function() {
+	it("should handle empty lines", function() {
 		testSource = 	"var moviesAndPricesCSV = \"name\\tprice\\n\" +\r\n" + 
 						"\"Casablanca\\t10\\n\" +\r\n" +
 						"\"Citizen Cane\\t7\\n\" +\r\n" +
