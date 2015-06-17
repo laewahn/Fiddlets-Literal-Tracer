@@ -135,4 +135,25 @@ describe("The domain controller", function() {
 		var result = controller.contextForPositionInSourceCmd({line: 5, ch: 1}, testSource);
         expect(Object.keys(result)).toEqual(["moviesAndPricesCSV"]);
 	});
+
+	it("should work with my example...", function() {
+		testSource = 	"var moviesAndPricesCSV = \"name\\tprice\\n\" +\r\n" + 
+						"\"Casablanca\\t10\\n\" +\r\n" +
+						"\"Citizen Cane\\t7\\n\" +\r\n" +
+						"\"Nosferatu\\t5\";\r\n" +
+						"\/\/ Parse the CSV into movie objects\r\n" +
+						"\r\n" +
+						"var movieFromLine = function(line) {\r\n" +
+						"	var elements = line.split(\"\\t\");\r\n" +
+						"   return new Movie(elements[0], elements[1]);\r\n" +
+						"}\r\n" +
+						"\r\n" +
+						"var lines = moviesAndPricesCSV.split(\"\\n\");\r\n" +
+						"var movies = lines.slice(1).map(movieFromLine);\r\n" +
+						"movies.push(\"foo\");";
+
+		var result = controller.contextForPositionInSourceCmd({line: 14, ch: 1}, testSource);
+		expect(Object.keys(result).length).toEqual(4);
+		expect(Object.keys(result)).toEqual(["movies", "lines", "moviesAndPricesCSV", "movieFromLine"]);
+	});
 });

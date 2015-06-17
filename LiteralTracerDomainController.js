@@ -73,6 +73,7 @@
 	};
 
 	exports.contextForLineCmd = function(line) {
+
 		var parsedLine = LineParser.parse(line);
 
 		function collectIdentifiers(c, e) {
@@ -93,7 +94,7 @@
 			return c;
 		}
 
-		return _.reduce(parsedLine, collectIdentifiers, {});
+		return _.reduce(parsedLine, collectIdentifiers, {}) || {};
 	};
 
 	var esprima = require("esprima");
@@ -101,7 +102,7 @@
 	exports.contextForPositionInSourceCmd = function(position, source) {
 		var lines = source.split("\n");
 		var theLine = lines[position.line - 1];
-		
+
 		var trace = exports.traceCmd(source, position);
 		var commands = esprima.parse(source, {range: true}).body;
 		
@@ -120,12 +121,12 @@
 		});
 
 		var nestedContexts = {};
-		collectContextForLine(theLine, commandSources, lastTrace, nestedContexts);
+		collectContextForLine(theLine, commandSources, lastTrace, nestedContexts, source);
 
 		return nestedContexts;
 	};
 
-	function collectContextForLine(line, allLines, trace, collector) {
+	function collectContextForLine(line, allLines, trace, collector, source) {
 		var contextFromLine = exports.contextForLineCmd(line);
 		Object.keys(contextFromLine).forEach(function(idFromLine) {
 			var contextFromTrace = trace.contextFor(idFromLine);
@@ -135,8 +136,8 @@
 				if(typeof(trace.results[idFromLine]) !== "function") {
 					
 					contextFromTrace.forEach(function(nextPosition){
-						var nextLine = nextPosition.start.line - 1;
-						collectContextForLine(allLines[nextLine], allLines, trace, collector);
+						var nextLine = source.substring(nextPosition.range[0], nextPosition.range[1]);
+						collectContextForLine(nextLine, allLines, trace, collector, source);
 					});
 				}
 			}
