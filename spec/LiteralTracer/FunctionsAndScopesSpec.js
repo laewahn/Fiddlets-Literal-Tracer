@@ -20,7 +20,7 @@ describe("For global scope", function() {
     });
 });
 
-xdescribe("For variables in functions", function() {
+describe("For variables in functions", function() {
     it("does not store them in the global scope", function() {
         var source = "function foo() {var a = 2;};";
         expect(testTracer.trace(source).tracedValueFor("a")).toEqual(undefined);
@@ -33,7 +33,7 @@ xdescribe("For variables in functions", function() {
     });
 });
 
-xdescribe("For function declarations", function() {
+describe("For function declarations", function() {
     it("stores the function", function() {
         var source = "function Cursor(){}";
         expect(testTracer.trace(source).tracedValueFor("Cursor")).not.toBe(null);
@@ -125,7 +125,7 @@ xdescribe("For function declarations", function() {
     });
 });
 
-xdescribe("For variable declarations inside functions", function() {
+describe("For variable declarations inside functions", function() {
     it("should return a new scoped return object with the variables declared", function() {
         var source = "function foo() { var bar = 'asdf'; }";
         var result = testTracer.trace(source);
@@ -225,7 +225,7 @@ xdescribe("For variable declarations inside functions", function() {
     });
 });
 
-xdescribe("For a given scope of a tracing result", function() {
+describe("For a given scope of a tracing result", function() {
     it("should give us all available variable assignments", function() {
         var source =    "var sth = 'sth';\n" +
                         "function foo() {\n" + 
@@ -251,7 +251,7 @@ xdescribe("For a given scope of a tracing result", function() {
     });
 });
 
-xdescribe("For scopes defined in one line", function() {
+describe("For scopes defined in one line", function() {
     it("can access the scopes by line and column number", function() {
         var source = "var sth = 'sth';function foo() {var baz = 'blah';function foo2() {var bar = 'asdf';}}";
         var result = testTracer.trace(source).scopeForPosition(1,72).allAssignments();
@@ -271,7 +271,7 @@ xdescribe("For scopes defined in one line", function() {
     });
 });
 
-xdescribe("For multiline programs", function() {
+describe("For multiline programs", function() {
     it("finds the right scope", function() {
         var source =    "var sth = 'sth';\n" +
                         "function foo() {\n" + 
