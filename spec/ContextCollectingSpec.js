@@ -156,4 +156,21 @@ describe("The domain controller", function() {
 		expect(Object.keys(result).length).toEqual(4);
 		expect(Object.keys(result)).toEqual(["movies", "lines", "moviesAndPricesCSV", "movieFromLine"]);
 	});
+
+	it("should find references to classes", function() {
+		testSource = "function SomeClass(name) {\r\n"+
+					 "    this.name = name;\r\n"+
+					 "}\r\n"+
+					 "\r\n"+
+					 "SomeClass.prototype.name = undefined;\r\n"+
+					 "SomeClass.prototype.foo = function() {\r\n"+
+					 "    console.log(\"foo\");\r\n"+
+					 "}\r\n"+
+					 "\r\n"+
+					 "var asdf = new SomeClass(\"bar\");\r\n"+
+					 "asdf.foo();\r\n";
+
+		var result = controller.contextForPositionInSourceCmd({line: 10, ch: 1}, testSource);
+		expect(Object.keys(result)).toEqual(["SomeClass"]);
+	});
 });
