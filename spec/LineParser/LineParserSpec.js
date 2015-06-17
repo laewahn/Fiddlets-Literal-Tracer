@@ -115,7 +115,7 @@ describe("For functions called on some variable", function(){
 	});
 });
 
-xdescribe("For functions called on some literal", function() {
+describe("For functions called on some literal", function() {
 	it("should return an array with the initialized array and the name of the function for one function", function() {
 		var source = "['a','b','c'].slice(1,2);\n";
 		var result = LineParser.parse(source);
@@ -173,5 +173,16 @@ describe("For assignments with no function chain on the right hand side", functi
 
 		expect(result.length).toEqual(1);
 		expect(result[0].name).toEqual('foo');
+	});
+});
+
+describe("For object instantiation", function() {
+	it("return the class of the object", function(){
+		var source = "var bar = new Foo(bar);\n";
+		var result = LineParser.parse(source);
+
+		expect(result.length).toEqual(1);
+		expect(result[0].name).toEqual("Foo");
+		expect(result[0].params[0].name).toEqual("bar");
 	});
 });
