@@ -167,7 +167,7 @@ describe("The domain controller", function() {
 					 "    console.log(\"foo\");\r\n"+
 					 "}\r\n"+
 					 "\r\n"+
-					 "var asdf = new SomeClass(\"bar\");\r\n"+
+					 "var asdf = new SomeClass();\r\n"+
 					 "asdf.foo();\r\n";
 
 		var result = controller.contextForPositionInSourceCmd({line: 10, ch: 1}, testSource);

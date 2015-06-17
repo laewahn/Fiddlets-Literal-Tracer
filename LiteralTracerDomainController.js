@@ -75,13 +75,14 @@
 	exports.contextForLineCmd = function(line) {
 
 		var parsedLine = LineParser.parse(line);
-
 		function collectIdentifiers(c, e) {
 			if(e.type === "Identifier") {
 				c[e.name] = lastTrace.contextFor(e.name);
 			}
 
-			if (e.type === "CallExpression" || hasParams(e)) {
+			if (e.type === "CallExpression" ||
+				e.type === "NewExpression"  ||
+				hasParams(e)) {
 					e.params.forEach(function(p){
 					collectIdentifiers(c, p);
 				});
