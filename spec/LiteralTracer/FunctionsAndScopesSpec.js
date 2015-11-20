@@ -70,6 +70,17 @@ describe("For function declarations", function() {
         expect(result.tracedValueFor("Cursor").prototype.fnc).toBeDefined();
         expect(result.tracedValueFor("Cursor").prototype.fnc).not.toBe(null);
         expect(typeof(result.tracedValueFor("Cursor").prototype.fnc)).toBe("function");
+
+        source = "function SomeClass() {}\r\n"+
+                     "\r\n"+
+                     "SomeClass.prototype.name = undefined;\r\n"+
+                     "SomeClass.prototype.foo = function() {}\r\n"+
+                     "\r\n"+
+                     "var asdf = new SomeClass();\r\n"+
+                     "asdf.foo();\r\n";
+        result = testTracer.trace(source);
+        expect(result.tracedValueFor("SomeClass").prototype.foo).toBeDefined();
+
     });
 
     it("does not fail for declarations to this", function() {

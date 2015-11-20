@@ -26,7 +26,7 @@ var testSource = 	"var y = \/*\"x\"*\/ \"xxxxxxxy\";\r\n" +
 					"\treturn \"foo_\" + value\r\n" + 
 					"};";
 
-describe("For the testSource", function(){
+xdescribe("For the testSource", function(){
 	it("should produce output when being parsed", function() {
 		var tr = require("../lib/LiteralTracer");
 		var tracer = new tr.Tracer();
@@ -35,7 +35,7 @@ describe("For the testSource", function(){
 	});
 });
 
-describe("LiteralTracer", function() {
+xdescribe("LiteralTracer", function() {
 	it("should keep a list of where a variable was used", function() {
 		var tr = require("../lib/LiteralTracer");
 		var tracer = new tr.Tracer();
@@ -55,11 +55,11 @@ describe("The domain controller", function() {
 
 	var controller = require("../LiteralTracerDomainController");
 
-	it("should have a command to get the context for a line", function() {
+	xit("should have a command to get the context for a line", function() {
 		expect(controller.contextForLineCmd).toBeDefined();
 	});
 
-	it("should return a context map for every variable used in the line", function() {
+	xit("should return a context map for every variable used in the line", function() {
 		controller.traceCmd(testSource, {line: 1, ch: 1});
 
 		var line = "var newArry = anArray.slice(0,index).map(appendBla);\r\n";
@@ -67,7 +67,7 @@ describe("The domain controller", function() {
 		expect(Object.keys(result)).toEqual(["anArray", "index", "appendBla"]);
 	});
 
-	it("should return a context map for locally available functions used in the line", function() {
+	xit("should return a context map for locally available functions used in the line", function() {
 		controller.traceCmd(testSource, {line: 1, ch: 1});
 
 		var line = "var x = appendBla(prependFoo(bla)).indexOf(\'blax\');\r\n";
@@ -75,12 +75,12 @@ describe("The domain controller", function() {
 		expect(Object.keys(result)).toEqual(["bla", "prependFoo", "appendBla"]);
 	});
 
-	it("should have a command to get the context for a line in some source", function() {
+	xit("should have a command to get the context for a line in some source", function() {
 		var result = controller.contextForPositionInSourceCmd({line: 10, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["anArray", "index" ,"appendBla"]);
 	});
 
-	it("should only return operations on objects used that occur before the selected line", function() {
+	xit("should only return operations on objects used that occur before the selected line", function() {
 		var result = controller.contextForPositionInSourceCmd({line: 12, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["bla", "prependFoo" ,"appendBla"]);
 		expect(result.bla.length).toEqual(1);
@@ -88,14 +88,14 @@ describe("The domain controller", function() {
 		expect(result.prependFoo.length).toBe(1);
 	});
 
-	it("should not include the current line", function() {
+	xit("should not include the current line", function() {
 		var result = controller.contextForPositionInSourceCmd({line: 13, ch: 1}, testSource);
 		
 		expect(result.bla.length).toEqual(1);
 		expect(result.bla[0].start.line).toEqual(3);
 	});
 
-	it("should include the context of the lines referenced by the context", function() {
+	xit("should include the context of the lines referenced by the context", function() {
 		testSource = "var moviesAndPricesCSV = \"name\\tprice\\nCasablanca\\t10\\nCitizen Cane\\t7\\nNosferatu\\t5\";\n" +
 					 "var lines = moviesAndPricesCSV.split(\"\\n\");\n" +
 					 "var withoutHeader = lines.slice(1);\n";
@@ -104,7 +104,7 @@ describe("The domain controller", function() {
         expect(Object.keys(result)).toEqual(["lines", "moviesAndPricesCSV"]);
 	});
 
-	it("should include the context of the lines referenced by the context in a more elaborated example", function() {
+	xit("should include the context of the lines referenced by the context in a more elaborated example", function() {
 		testSource = "var moviesAndPricesCSV = \"name\\tprice\\nCasablanca\\t10\\nCitizen Cane\\t7\\nNosferatu\\t5\";\n" +
 					 "var lines = moviesAndPricesCSV.split(\"\\n\");\n" +
 					 "var withoutHeader = lines.slice(1);\n" +
@@ -125,7 +125,7 @@ describe("The domain controller", function() {
         expect(Object.keys(result)).toEqual(["baz", "lines", "moviesAndPricesCSV", "bar"]);
 	});
 
-	it("should be able to handle multiline commands", function() {
+	xit("should be able to handle multiline commands", function() {
 		testSource = "var moviesAndPricesCSV = \"name\\tprice\"+\n" +
 					 "\"Casablanca\\t10\" + \n" +
 					 "\"Citizen Cane\\t7\" + \n" +
@@ -136,7 +136,7 @@ describe("The domain controller", function() {
         expect(Object.keys(result)).toEqual(["moviesAndPricesCSV"]);
 	});
 
-	it("should handle empty lines", function() {
+	xit("should handle empty lines", function() {
 		testSource = 	"var moviesAndPricesCSV = \"name\\tprice\\n\" +\r\n" + 
 						"\"Casablanca\\t10\\n\" +\r\n" +
 						"\"Citizen Cane\\t7\\n\" +\r\n" +
@@ -157,7 +157,7 @@ describe("The domain controller", function() {
 		expect(Object.keys(result)).toEqual(["movies", "lines", "moviesAndPricesCSV", "movieFromLine"]);
 	});
 
-	it("should find references to classes", function() {
+	xit("should find references to classes", function() {
 		testSource = "function SomeClass(name) {\r\n"+
 					 "    this.name = name;\r\n"+
 					 "}\r\n"+
@@ -172,5 +172,33 @@ describe("The domain controller", function() {
 
 		var result = controller.contextForPositionInSourceCmd({line: 10, ch: 1}, testSource);
 		expect(Object.keys(result)).toEqual(["SomeClass"]);
+	});
+
+	it("should find references to the classes methods", function() {
+		testSource = "function SomeClass(name) {\r\n"+
+					 "//    this.name = name;\r\n"+
+					 "}\r\n"+
+					 "\r\n"+
+					 "//SomeClass.prototype.name = undefined;\r\n"+
+					 "SomeClass.prototype.foo = function() {\r\n"+
+					 "    console.log(\"foo\");\r\n"+
+					 "}\r\n"+
+					 "\r\n"+
+					 "var asdf = new SomeClass();\r\n"+
+					 "asdf.foo();\r\n";
+
+		var tr = require("../lib/LiteralTracer");
+		var tracer = new tr.Tracer();
+		
+		var tracingResult = tracer.trace(testSource);
+		var theFoo = tracingResult.tracedValueFor("SomeClass").prototype.foo;
+		expect(theFoo).toBeDefined();
+		
+		// console.log("!!!! " + typeof(theFoo));
+		// console.log("!!!! " + JSON.stringify(tracingResult.tracedValueFor("SomeClass").prototype.foo));
+		expect(tracingResult.contextFor("SomeClass")).toBeDefined();
+
+		var result = controller.contextForPositionInSourceCmd({line: 11, ch: 1}, testSource);
+		expect(Object.keys(result)).toEqual(["asdf", "foo", "SomeClass"]);
 	});
 });

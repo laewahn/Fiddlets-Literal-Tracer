@@ -75,6 +75,8 @@
 	exports.contextForLineCmd = function(line) {
 
 		var parsedLine = LineParser.parse(line);
+		// console.log("Parsed line: " + JSON.stringify(parsedLine, null, 2));
+		// console.log("Last trace: " + JSON.stringify(lastTrace.results.__contextMapping, null, 2));
 		function collectIdentifiers(c, e) {
 			if(e.type === "Identifier") {
 				c[e.name] = lastTrace.contextFor(e.name);
@@ -129,6 +131,7 @@
 
 	function collectContextForLine(line, allLines, trace, collector, source) {
 		var contextFromLine = exports.contextForLineCmd(line);
+		// console.log("context from line " + JSON.stringify(line) + " is " + JSON.stringify(contextFromLine, null, 2));
 		Object.keys(contextFromLine).forEach(function(idFromLine) {
 			var contextFromTrace = trace.contextFor(idFromLine);
 			if(contextFromTrace !== undefined && collector[idFromLine] === undefined) {
